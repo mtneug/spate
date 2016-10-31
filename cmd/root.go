@@ -18,15 +18,36 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/mtneug/spate/api"
 	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{
 	Use:   "spate",
 	Short: "Horizontal service autoscaler for Docker Swarm mode",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		flags := cmd.Flags()
+
+		intf, err := flags.GetString("interface")
+		if err != nil {
+			return err
+		}
+
+		port, err := flags.GetUint16("port")
+		if err != nil {
+			return err
+		}
+
+		api.Run(intf, port)
+
+		return nil
+	},
 }
 
 func init() {
+	rootCmd.Flags().String("interface", "", "Interface to bind to")
+	rootCmd.Flags().Uint16P("port", "p", 8080, "Port to bind to")
+
 	rootCmd.AddCommand(
 		versionCmd,
 	)
