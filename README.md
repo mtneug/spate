@@ -21,4 +21,4 @@
 
 ## License
 
-<!-- TODO: Add content -->
+Apache 2.0 © Matthias Neugebauer
