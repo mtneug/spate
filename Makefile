@@ -17,12 +17,22 @@ GIT_TREE_STATE=$(shell sh -c 'if test -z "`git status --porcelain 2>/dev/null`";
 BUILD_DATE=$(shell date -u +"%Y-%m-%d")
 
 GO_PKG=github.com/mtneug/spate
-GO_LDFLAGS="-X $(GO_PKG)/version.gitCommit=$(GIT_COMMIT) -X $(GO_PKG)/version.gitTreeState=$(GIT_TREE_STATE) -X $(GO_PKG)/version.buildDate=$(BUILD_DATE)"
+GO_PKG_ALL=$(shell go list ./... | grep -v /vendor/)
+GO_LDFLAGS=-ldflags "-X $(GO_PKG)/version.gitCommit=$(GIT_COMMIT) -X $(GO_PKG)/version.gitTreeState=$(GIT_TREE_STATE) -X $(GO_PKG)/version.buildDate=$(BUILD_DATE)"
+GO_BUILD_ARGS=-v $(GO_LDFLAGS)
 
 all: build
 
 build:
 	@echo "🌊 $@"
-	@go build -v -o bin/spate -ldflags $(GO_LDFLAGS) $(GO_PKG)
+	@go build $(GO_BUILD_ARGS) -o bin/spate $(GO_PKG)
 
-.PHONY: all build
+install:
+	@echo "🌊 $@"
+	@go install $(GO_BUILD_ARGS) $(GO_PKG)
+
+test:
+	@echo "🌊 $@"
+	@go test $(GO_PKG_ALL)
+
+.PHONY: all build install test
