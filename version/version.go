@@ -26,9 +26,9 @@ var (
 	major        = "0"
 	minor        = "0"
 	patch        = "1"
-	gitCommit    = "unknown (not build with `make all`)"
-	gitTreeState = "unknown (not build with `make all`)"
-	buildDate    = "unknown (not build with `make all`)"
+	gitCommit    string // set by Makefile
+	gitTreeState string // set by Makefile
+	buildDate    string // set by Makefile
 	goVersion    = runtime.Version()
 	compiler     = runtime.Compiler
 	platform     = fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH)
