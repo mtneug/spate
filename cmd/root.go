@@ -28,25 +28,19 @@ var rootCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		flags := cmd.Flags()
 
-		intf, err := flags.GetString("interface")
+		addr, err := flags.GetString("listen-address")
 		if err != nil {
 			return err
 		}
 
-		port, err := flags.GetUint16("port")
-		if err != nil {
-			return err
-		}
-
-		api.Run(intf, port)
+		api.Run(addr)
 
 		return nil
 	},
 }
 
 func init() {
-	rootCmd.Flags().String("interface", "", "Interface to bind to")
-	rootCmd.Flags().Uint16P("port", "p", 8080, "Port to bind to")
+	rootCmd.Flags().String("listen-address", ":8080", "Interface to bind to")
 
 	rootCmd.AddCommand(
 		infoCmd,

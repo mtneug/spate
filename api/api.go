@@ -14,14 +14,9 @@
 
 package api
 
-import (
-	"fmt"
-	"net/http"
-)
+import "net/http"
 
 // Run starts the REST API and listens for requests.
-func Run(intf string, port uint16) {
-	addr := fmt.Sprintf("%v:%v", intf, port)
-
+func Run(addr string) {
 	http.ListenAndServe(addr, nil)
 }
