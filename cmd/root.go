@@ -49,6 +49,7 @@ func init() {
 	rootCmd.Flags().Uint16P("port", "p", 8080, "Port to bind to")
 
 	rootCmd.AddCommand(
+		infoCmd,
 		versionCmd,
 	)
 }
