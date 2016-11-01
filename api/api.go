@@ -14,9 +14,14 @@
 
 package api
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/prometheus/client_golang/prometheus"
+)
 
 // Run starts the REST API and listens for requests.
 func Run(addr string) {
+	http.Handle("/metrics", prometheus.Handler())
 	http.ListenAndServe(addr, nil)
 }

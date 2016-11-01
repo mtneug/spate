@@ -19,6 +19,7 @@ import (
 	"runtime"
 
 	"github.com/mtneug/spate/pkg/version"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 var (
@@ -45,3 +46,16 @@ var (
 		Platform:     platform,
 	}
 )
+
+func init() {
+	spateInfo := prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "spate_info",
+			Help: "A metric with a constant '1' value labeled by major, minor, patch, git commit, git tree state, build date, Go version, compiler, and platform.",
+		},
+		[]string{"major", "minor", "patch", "gitCommit", "gitTreeState", "buildDate", "goVersion", "compiler", "platform"},
+	)
+	spateInfo.WithLabelValues(Spate.Major, Spate.Minor, Spate.Patch, Spate.GitCommit, Spate.GitTreeState, Spate.BuildDate, Spate.GoVersion, Spate.Compiler, Spate.Platform).Set(1)
+
+	prometheus.MustRegister(spateInfo)
+}
