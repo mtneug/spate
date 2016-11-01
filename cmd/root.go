@@ -15,10 +15,13 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
+	"os/signal"
 
 	"github.com/mtneug/spate/api"
+	"github.com/mtneug/spate/autoscaler"
 	"github.com/spf13/cobra"
 )
 
@@ -26,6 +29,9 @@ var rootCmd = &cobra.Command{
 	Use:   "spate",
 	Short: "Horizontal service autoscaler for Docker Swarm mode",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+
 		flags := cmd.Flags()
 
 		addr, err := flags.GetString("listen-address")
@@ -33,9 +39,37 @@ var rootCmd = &cobra.Command{
 			return err
 		}
 
-		api.Run(addr)
+		// API server
+		a, err := api.New(&api.Config{
+			Addr: addr,
+		})
+		if err != nil {
+			return err
+		}
 
-		return nil
+		if err := a.Start(ctx); err != nil {
+			return err
+		}
+
+		// Scaler
+		s, err := autoscaler.New(&autoscaler.Config{})
+		if err != nil {
+			return err
+		}
+
+		if err := s.Start(ctx); err != nil {
+			return err
+		}
+
+		// Handle termination
+		sig := make(chan os.Signal, 1)
+		signal.Notify(sig, os.Interrupt)
+		go func() {
+			<-sig
+			s.Stop(ctx)
+		}()
+
+		return s.Err(ctx)
 	},
 }
 

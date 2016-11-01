@@ -15,13 +15,32 @@
 package api
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-// Run starts the REST API and listens for requests.
-func Run(addr string) {
+// Config for an API server.
+type Config struct {
+	Addr string
+}
+
+// Server implements an API server.
+type Server struct {
+	config *Config
+}
+
+// New creates a new API server.
+func New(c *Config) (*Server, error) {
+	s := &Server{
+		config: c,
+	}
+	return s, nil
+}
+
+// Start the API server and listens for requests.
+func (s *Server) Start(context.Context) error {
 	http.Handle("/metrics", prometheus.Handler())
-	http.ListenAndServe(addr, nil)
+	return http.ListenAndServe(s.config.Addr, nil)
 }
