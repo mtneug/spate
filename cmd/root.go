@@ -16,10 +16,10 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/mtneug/spate/api"
 	"github.com/mtneug/spate/autoscaler"
 	"github.com/spf13/cobra"
@@ -28,6 +28,14 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "spate",
 	Short: "Horizontal service autoscaler for Docker Swarm mode",
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		v, err := cmd.Flags().GetBool("verbose")
+		if err != nil || !v {
+			return err
+		}
+		log.SetLevel(log.DebugLevel)
+		return nil
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
@@ -75,6 +83,7 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	rootCmd.Flags().String("listen-address", ":8080", "Interface to bind to")
+	rootCmd.Flags().Bool("verbose", false, "Enable verbose logging")
 
 	rootCmd.AddCommand(
 		infoCmd,
@@ -85,7 +94,6 @@ func init() {
 // Execute invoces the top-level command.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(-1)
+		log.WithError(err).Fatal("An error occurred")
 	}
 }

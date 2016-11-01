@@ -19,6 +19,7 @@ import (
 	"errors"
 	"sync"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/docker/docker/client"
 )
 
@@ -72,6 +73,7 @@ func (a *Autoscaler) Start(ctx context.Context) error {
 	err := ErrStarted
 
 	a.startOnce.Do(func() {
+		log.Info("Starting autostaler")
 		close(a.startChan)
 		go a.run(ctx)
 		err = nil
@@ -90,6 +92,7 @@ func (a *Autoscaler) Stop(ctx context.Context) error {
 	}
 
 	a.stopOnce.Do(func() {
+		log.Info("Stopping autostaler")
 		close(a.stopChan)
 	})
 
@@ -113,7 +116,9 @@ func (a *Autoscaler) Err(ctx context.Context) error {
 
 func (a *Autoscaler) run(ctx context.Context) (err error) {
 	defer func() { a.err = err }()
+	defer func() { log.Info("Autoscaler stopped") }()
 
+	log.Info("Autoscaler started")
 	for {
 		select {
 		case <-a.stopChan:

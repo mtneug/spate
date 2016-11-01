@@ -18,6 +18,7 @@ import (
 	"context"
 	"net/http"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -42,5 +43,10 @@ func New(c *Config) (*Server, error) {
 // Start the API server and listens for requests.
 func (s *Server) Start(context.Context) error {
 	http.Handle("/metrics", prometheus.Handler())
-	return http.ListenAndServe(s.config.Addr, nil)
+
+	log.Info("Starting API server")
+	go http.ListenAndServe(s.config.Addr, nil)
+	log.Info("API server started")
+
+	return nil
 }
