@@ -82,8 +82,9 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
+	rootCmd.PersistentFlags().Bool("verbose", false, "Enable verbose logging")
+
 	rootCmd.Flags().String("listen-address", ":8080", "Interface to bind to")
-	rootCmd.Flags().Bool("verbose", false, "Enable verbose logging")
 
 	rootCmd.AddCommand(
 		infoCmd,
