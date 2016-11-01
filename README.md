@@ -1,5 +1,7 @@
 # `spate`
 
+[![Build Status](https://travis-ci.com/mtneug/spate.svg?token=GBfvMyahwz6qx8tjv3VG&branch=master)](https://travis-ci.com/mtneug/spate)
+
 > **spate** `/speɪt/`  
 > noun
 >
@@ -11,11 +13,11 @@
 
 `spate` is a horizontal service autoscaler for [Docker Swarm mode](https://docs.docker.com/engine/swarm/) inspired by Kubernetes' [Horizontal Pod Autoscaler](http://kubernetes.io/docs/user-guide/horizontal-pod-autoscaling/).
 
-## Quick Start
+## Install
 
 <!-- TODO: Add content -->
 
-## Install
+## Quick Start
 
 <!-- TODO: Add content -->
 

@@ -23,6 +23,8 @@ GO_BUILD_ARGS=-v $(GO_LDFLAGS)
 
 all: build
 
+ci: test
+
 build:
 	@echo "🌊 $@"
 	@go build $(GO_BUILD_ARGS) -o bin/spate $(GO_PKG)
