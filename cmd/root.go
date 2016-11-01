@@ -26,8 +26,10 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "spate",
-	Short: "Horizontal service autoscaler for Docker Swarm mode",
+	Use:           "spate",
+	Short:         "Horizontal service autoscaler for Docker Swarm mode",
+	SilenceErrors: true,
+	SilenceUsage:  true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		v, err := cmd.Flags().GetBool("verbose")
 		if err != nil || !v {
