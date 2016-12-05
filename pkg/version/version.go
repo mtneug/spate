@@ -14,11 +14,16 @@
 
 package version
 
-import "fmt"
+import (
+	"fmt"
+	"io"
+)
 
 // Info holds version and build information. The fields are largly the same as
 // in the `k8s.io/kubernetes/pkg/version` package of the Kubernetes project.
 type Info struct {
+	// Name of the versioned object.
+	Name string `json:"name"`
 	// Major version number.
 	Major string `json:"major"`
 	// Minor version number.
@@ -27,7 +32,7 @@ type Info struct {
 	Patch string `json:"patch"`
 	// GitCommit SHA.
 	GitCommit string `json:"gitCommit"`
-	// GitTreeState is either "Clean" or "Dirty".
+	// GitTreeState is either "clean" or "dirty".
 	GitTreeState string `json:"gitTreeState"`
 	// BuildDate of the binary.
 	BuildDate string `json:"buildDate"`
@@ -42,4 +47,16 @@ type Info struct {
 // String returns a formated version string.
 func (i Info) String() string {
 	return fmt.Sprintf("%v.%v.%v+%v", i.Major, i.Minor, i.Patch, i.GitCommit)
+}
+
+// PrintFull writes the version
+func (i Info) PrintFull(w io.Writer) {
+	fmt.Fprintf(w, "%v:\n", i.Name)
+	fmt.Fprintf(w, "  Version: %v\n", i)
+	fmt.Fprintf(w, "  GitCommit: %v\n", i.GitCommit)
+	fmt.Fprintf(w, "  GitTreeState: %v\n", i.GitTreeState)
+	fmt.Fprintf(w, "  BuildDate: %v\n", i.BuildDate)
+	fmt.Fprintf(w, "  GoVersion: %v\n", i.GoVersion)
+	fmt.Fprintf(w, "  Compiler: %v\n", i.Compiler)
+	fmt.Fprintf(w, "  Platform: %v\n", i.Platform)
 }
