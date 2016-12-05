@@ -14,16 +14,16 @@
 
 GIT_COMMIT=$(shell git rev-parse --short HEAD || echo "unknown")
 GIT_TREE_STATE=$(shell sh -c 'if test -z "`git status --porcelain 2>/dev/null`"; then echo clean; else echo dirty; fi')
-BUILD_DATE=$(shell date -u +"%Y-%m-%d")
+BUILD_DATE=$(shell date -u +"%Y-%m-%d %T %Z")
 
 PKG=$(shell cat .godir)
 PKG_INTEGRATION=${PKG}/integration
 PKGS=$(shell go list ./... | grep -v /vendor/)
 
 GO_LDFLAGS=-ldflags " \
-	-X $(PKG)/version.gitCommit=$(GIT_COMMIT) \
-	-X $(PKG)/version.gitTreeState=$(GIT_TREE_STATE) \
-	-X $(PKG)/version.buildDate=$(BUILD_DATE)"
+	-X '$(PKG)/version.gitCommit=$(GIT_COMMIT)' \
+	-X '$(PKG)/version.gitTreeState=$(GIT_TREE_STATE)' \
+	-X '$(PKG)/version.buildDate=$(BUILD_DATE)'"
 GO_BUILD_ARGS=-v $(GO_LDFLAGS)
 
 GOMETALINTER_COMMON_ARGS=\
