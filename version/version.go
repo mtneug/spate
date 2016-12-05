@@ -35,6 +35,7 @@ var (
 
 	// Spate exposes the version number.
 	Spate = version.Info{
+		Name:         "spate",
 		Major:        major,
 		Minor:        minor,
 		Patch:        patch,

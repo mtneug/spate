@@ -16,12 +16,14 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/mtneug/spate/api"
 	"github.com/mtneug/spate/autoscaler"
+	"github.com/mtneug/spate/version"
 	"github.com/spf13/cobra"
 )
 
@@ -30,13 +32,35 @@ var rootCmd = &cobra.Command{
 	Short:         "Horizontal service autoscaler for Docker Swarm mode",
 	SilenceErrors: true,
 	SilenceUsage:  true,
-	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		v, err := cmd.Flags().GetBool("verbose")
-		if err != nil || !v {
-			return err
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		flag, err := cmd.Flags().GetString("log-level")
+		if err != nil {
+			log.Fatal(err)
 		}
-		log.SetLevel(log.DebugLevel)
-		return nil
+		level, err := log.ParseLevel(flag)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.SetLevel(level)
+
+		i, err := cmd.Flags().GetBool("info")
+		if err != nil {
+			log.Fatal(err)
+		}
+		if i {
+			version.Spate.PrintFull(os.Stdout)
+			// TODO: print infos about Docker
+			os.Exit(0)
+		}
+
+		v, err := cmd.Flags().GetBool("version")
+		if err != nil {
+			log.Fatal(err)
+		}
+		if v {
+			fmt.Println(version.Spate)
+			os.Exit(0)
+		}
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx, cancel := context.WithCancel(context.Background())
@@ -57,7 +81,7 @@ var rootCmd = &cobra.Command{
 			return err
 		}
 
-		if err := a.Start(ctx); err != nil {
+		if err = a.Start(ctx); err != nil {
 			return err
 		}
 
@@ -84,14 +108,10 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.PersistentFlags().Bool("verbose", false, "Enable verbose logging")
-
+	rootCmd.Flags().Bool("info", false, "Print spate environment information and exit")
 	rootCmd.Flags().String("listen-address", ":8080", "Interface to bind to")
-
-	rootCmd.AddCommand(
-		infoCmd,
-		versionCmd,
-	)
+	rootCmd.Flags().String("log-level", "info", `Log level ("debug", "info", "warn", "error", "fatal", "panic")`)
+	rootCmd.Flags().BoolP("version", "v", false, "Print the version and exit")
 }
 
 // Execute invoces the top-level command.
