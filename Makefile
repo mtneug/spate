@@ -26,8 +26,28 @@ GO_LDFLAGS=-ldflags " \
 	-X $(PKG)/version.buildDate=$(BUILD_DATE)"
 GO_BUILD_ARGS=-v $(GO_LDFLAGS)
 
-all: lint-fast build test integration
-ci: lint build coverage coverage-integration
+GOMETALINTER_COMMON_ARGS=\
+	--sort=path \
+	--vendor \
+	--tests \
+	--vendored-linters \
+	--disable-all \
+	--enable=gofmt \
+	--enable=vet \
+	--enable=vetshadow \
+	--enable=golint \
+	--enable=ineffassign \
+	--enable=goconst \
+	--enable=goimports \
+	--enable=dupl \
+	--enable=staticcheck \
+	--enable=unused \
+	--enable=misspell \
+	--enable=lll \
+	--line-length=120
+
+all: lint build test integration
+ci: lint-full build coverage coverage-integration
 
 build:
 	@echo "🌊 $@"
@@ -43,54 +63,16 @@ clean:
 
 lint:
 	@echo "🌊 $@"
-	@test -z "$$(gometalinter \
-			--vendor \
-			--tests \
-			--deadline=5m \
-			--vendored-linters \
-			--disable-all \
-			--enable=gofmt \
-			--enable=vet \
-			--enable=vetshadow \
-			--enable=golint \
-			--enable=ineffassign \
-			--enable=goconst \
-			--enable=goimports \
+	@test -z "$$(gometalinter --deadline=5s ${GOMETALINTER_COMMON_ARGS} ./... | tee /dev/stderr)"
+
+lint-full:
+	@echo "🌊 $@"
+	@test -z "$$(gometalinter --deadline=5m ${GOMETALINTER_COMMON_ARGS} \
 			--enable=deadcode \
 			--enable=varcheck \
 			--enable=structcheck \
 			--enable=errcheck \
-			--enable=dupl \
 			--enable=unconvert \
-			--enable=staticcheck \
-			--enable=unused \
-			--enable=misspell \
-			--enable=lll \
-			--line-length=120 \
-			./... | \
-		tee /dev/stderr)"
-
-lint-fast:
-	@echo "🌊 $@"
-	@test -z "$$(gometalinter \
-			--vendor \
-			--tests \
-			--deadline=5s \
-			--vendored-linters \
-			--disable-all \
-			--enable=gofmt \
-			--enable=vet \
-			--enable=vetshadow \
-			--enable=golint \
-			--enable=ineffassign \
-			--enable=goconst \
-			--enable=goimports \
-			--enable=dupl \
-			--enable=staticcheck \
-			--enable=unused \
-			--enable=misspell \
-			--enable=lll \
-			--line-length=120 \
 			./... | \
 		tee /dev/stderr)"
 
@@ -109,10 +91,10 @@ coverage:
 		go test -race -coverprofile="../../../$$pkg/coverage.txt" -covermode=atomic $$pkg; \
 		true $$((status=status+$$?)); \
 	done; \
-  exit $$status
+	exit $$status
 
 coverage-integration:
 	@echo "🌊 $@"
 	@go test -race -coverprofile="../../../${PKG_INTEGRATION}/coverage.txt" -covermode=atomic ${PKG_INTEGRATION}
 
-.PHONY: all ci build install clean lint lint-fast test integration coverage coverage-integration
+.PHONY: all ci build install clean lint lint-full test integration coverage coverage-integration
