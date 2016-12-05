@@ -29,5 +29,6 @@ matrix:
 
 before_install:
   - docker info
+  - go get -v github.com/alecthomas/gometalinter
 script:
   - make ci

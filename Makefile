@@ -16,25 +16,103 @@ GIT_COMMIT=$(shell git rev-parse --short HEAD || echo "unknown")
 GIT_TREE_STATE=$(shell sh -c 'if test -z "`git status --porcelain 2>/dev/null`"; then echo clean; else echo dirty; fi')
 BUILD_DATE=$(shell date -u +"%Y-%m-%d")
 
-GO_PKG=github.com/mtneug/spate
-GO_PKG_ALL=$(shell go list ./... | grep -v /vendor/)
-GO_LDFLAGS=-ldflags "-X $(GO_PKG)/version.gitCommit=$(GIT_COMMIT) -X $(GO_PKG)/version.gitTreeState=$(GIT_TREE_STATE) -X $(GO_PKG)/version.buildDate=$(BUILD_DATE)"
+PKG=$(shell cat .godir)
+PKG_INTEGRATION=${PKG}/integration
+PKGS=$(shell go list ./... | grep -v /vendor/)
+
+GO_LDFLAGS=-ldflags " \
+	-X $(PKG)/version.gitCommit=$(GIT_COMMIT) \
+	-X $(PKG)/version.gitTreeState=$(GIT_TREE_STATE) \
+	-X $(PKG)/version.buildDate=$(BUILD_DATE)"
 GO_BUILD_ARGS=-v $(GO_LDFLAGS)
 
-all: build
-
-ci: test
+all: lint-fast build test integration
+ci: lint build coverage coverage-integration
 
 build:
 	@echo "🌊 $@"
-	@go build $(GO_BUILD_ARGS) -o bin/spate $(GO_PKG)
+	@go build $(GO_BUILD_ARGS) -o bin/spate $(PKG)
 
 install:
 	@echo "🌊 $@"
-	@go install $(GO_BUILD_ARGS) $(GO_PKG)
+	@go install $(GO_BUILD_ARGS) $(PKG)
+
+clean:
+	@echo "🌊 $@"
+	@rm -f bin
+
+lint:
+	@echo "🌊 $@"
+	@test -z "$$(gometalinter \
+			--vendor \
+			--tests \
+			--deadline=5m \
+			--vendored-linters \
+			--disable-all \
+			--enable=gofmt \
+			--enable=vet \
+			--enable=vetshadow \
+			--enable=golint \
+			--enable=ineffassign \
+			--enable=goconst \
+			--enable=goimports \
+			--enable=deadcode \
+			--enable=varcheck \
+			--enable=structcheck \
+			--enable=errcheck \
+			--enable=dupl \
+			--enable=unconvert \
+			--enable=staticcheck \
+			--enable=unused \
+			--enable=misspell \
+			--enable=lll \
+			--line-length=120 \
+			./... | \
+		tee /dev/stderr)"
+
+lint-fast:
+	@echo "🌊 $@"
+	@test -z "$$(gometalinter \
+			--vendor \
+			--tests \
+			--deadline=5s \
+			--vendored-linters \
+			--disable-all \
+			--enable=gofmt \
+			--enable=vet \
+			--enable=vetshadow \
+			--enable=golint \
+			--enable=ineffassign \
+			--enable=goconst \
+			--enable=goimports \
+			--enable=dupl \
+			--enable=staticcheck \
+			--enable=unused \
+			--enable=misspell \
+			--enable=lll \
+			--line-length=120 \
+			./... | \
+		tee /dev/stderr)"
 
 test:
 	@echo "🌊 $@"
-	@go test $(GO_PKG_ALL)
+	@go test -parallel 8 -race $(filter-out ${PKG_INTEGRATION},${PKGS})
 
-.PHONY: all build install test
+integration:
+	@echo "🌊 $@"
+	@go test -parallel 8 -race ${PKG_INTEGRATION}
+
+coverage:
+	@echo "🌊 $@"
+	@status=0; \
+	for pkg in $(filter-out ${PKG_INTEGRATION},${PKGS}); do \
+		go test -race -coverprofile="../../../$$pkg/coverage.txt" -covermode=atomic $$pkg; \
+		true $$((status=status+$$?)); \
+	done; \
+  exit $$status
+
+coverage-integration:
+	@echo "🌊 $@"
+	@go test -race -coverprofile="../../../${PKG_INTEGRATION}/coverage.txt" -covermode=atomic ${PKG_INTEGRATION}
+
+.PHONY: all ci build install clean lint lint-fast test integration coverage coverage-integration
