@@ -1,4 +1,4 @@
-# `spate`
+# :ocean: `spate` 
 
 [![Build Status](https://travis-ci.com/mtneug/spate.svg?token=GBfvMyahwz6qx8tjv3VG&branch=master)](https://travis-ci.com/mtneug/spate)
 
