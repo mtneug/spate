@@ -53,13 +53,13 @@ func TestPrintFull(t *testing.T) {
 
 	got := b.String()
 	want := `myapp:
-  Version: 1.2.3+abcdefg
-  GitCommit: abcdefg
-  GitTreeState: clean
-  BuildDate: 2016-12-05 19:52:06 UTC
-  GoVersion: go1.7.4
-  Compiler: gc
-  Platform: linux/amd64
+  Version:        1.2.3+abcdefg
+  Git Commit:     abcdefg
+  Git Tree State: clean
+  Build Date:     2016-12-05 19:52:06 UTC
+  Go Version:     go1.7.4
+  Compiler:       gc
+  Platform:       linux/amd64
 `
 
 	if got != want {

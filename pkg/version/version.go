@@ -17,7 +17,18 @@ package version
 import (
 	"fmt"
 	"io"
+	"text/template"
 )
+
+var printTemplate = `{{.Name}}:
+  Version:        {{.Major}}.{{.Minor}}.{{.Patch}}+{{.GitCommit}}
+  Git Commit:     {{.GitCommit}}
+  Git Tree State: {{.GitTreeState}}
+  Build Date:     {{.BuildDate}}
+  Go Version:     {{.GoVersion}}
+  Compiler:       {{.Compiler}}
+  Platform:       {{.Platform}}
+`
 
 // Info holds version and build information. The fields are largly the same as
 // in the `k8s.io/kubernetes/pkg/version` package of the Kubernetes project.
@@ -50,13 +61,11 @@ func (i Info) String() string {
 }
 
 // PrintFull writes the version
-func (i Info) PrintFull(w io.Writer) {
-	fmt.Fprintf(w, "%v:\n", i.Name)
-	fmt.Fprintf(w, "  Version: %v\n", i)
-	fmt.Fprintf(w, "  GitCommit: %v\n", i.GitCommit)
-	fmt.Fprintf(w, "  GitTreeState: %v\n", i.GitTreeState)
-	fmt.Fprintf(w, "  BuildDate: %v\n", i.BuildDate)
-	fmt.Fprintf(w, "  GoVersion: %v\n", i.GoVersion)
-	fmt.Fprintf(w, "  Compiler: %v\n", i.Compiler)
-	fmt.Fprintf(w, "  Platform: %v\n", i.Platform)
+func (i Info) PrintFull(w io.Writer) (err error) {
+	t, err := template.New("info").Parse(printTemplate)
+	if err != nil {
+		return
+	}
+	err = t.Execute(w, i)
+	return
 }
