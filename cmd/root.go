@@ -23,6 +23,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/mtneug/spate/api"
 	"github.com/mtneug/spate/autoscaler"
+	"github.com/mtneug/spate/docker"
 	"github.com/mtneug/spate/version"
 	"github.com/spf13/cobra"
 )
@@ -49,7 +50,11 @@ var rootCmd = &cobra.Command{
 		}
 		if i {
 			version.Spate.PrintFull(os.Stdout)
-			// TODO: print infos about Docker
+			if docker.Err == nil {
+				docker.PrintInfo(context.Background(), os.Stdout)
+			} else {
+				fmt.Println("docker: could not connect")
+			}
 			os.Exit(0)
 		}
 

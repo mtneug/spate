@@ -15,13 +15,76 @@
 // Package docker contains code for integrating with Docker.
 package docker
 
-import "github.com/docker/docker/client"
+import (
+	"context"
+	"io"
+	"strconv"
+	"text/template"
 
-// Client is the default Docker client instance.
-var Client *client.Client
+	"github.com/docker/docker/client"
+)
 
-// InitializeClient initializes a new Docker client.
-func InitializeClient() (err error) {
-	Client, err = client.NewEnvClient()
+var (
+	// C is the default Docker client instance.
+	C *client.Client
+
+	// Err is the error that was returned when creating the Docker client.
+	Err error
+
+	printTemplate = `docker:
+  ID:             {{.ID}}
+  API Version:    {{.APIVersion}}
+  Server Version: {{.ServerVersion}}
+  Swarm:          {{.SwarmLocalNodeState}}
+    Cluster ID:   {{.SwarmID}}
+    Nodes:        {{.SwarmNodes}}
+    Managers:     {{.SwarmManagers}}
+`
+)
+
+func init() {
+	C, Err = client.NewEnvClient()
+}
+
+// PrintInfo writes informations about Docker relevant to spate to the given
+// Writer.
+//
+//	// Print to Stdout
+//	docker.PrintInfo(context.Background(), os.Stdout)
+func PrintInfo(ctx context.Context, w io.Writer) (err error) {
+	i, err := C.Info(ctx)
+	if err != nil {
+		return
+	}
+
+	s, err := C.ServerVersion(ctx)
+	if err != nil {
+		return
+	}
+
+	t, err := template.New("info").Parse(printTemplate)
+	if err != nil {
+		return
+	}
+
+	d := struct {
+		ID,
+		APIVersion,
+		ServerVersion,
+		SwarmLocalNodeState,
+		SwarmID,
+		SwarmNodes,
+		SwarmManagers string
+	}{
+		i.ID,
+		s.APIVersion,
+		i.ServerVersion,
+		string(i.Swarm.LocalNodeState),
+		i.Swarm.Cluster.ID,
+		strconv.Itoa(i.Swarm.Nodes),
+		strconv.Itoa(i.Swarm.Managers),
+	}
+
+	err = t.Execute(w, d)
 	return
 }
