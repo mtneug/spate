@@ -16,37 +16,64 @@ package api
 
 import (
 	"context"
+	"net"
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-// Config for an API server.
+// Config for a spate API server.
 type Config struct {
 	Addr string
 }
 
-// Server implements an API server.
+// Server implements a spate API server.
 type Server struct {
-	config *Config
+	config   *Config
+	server   *http.Server
+	err      error
+	doneChan chan struct{}
 }
 
-// New creates a new API server.
+// New creates a new server.
 func New(c *Config) (*Server, error) {
-	s := &Server{
-		config: c,
+	mux := http.NewServeMux()
+	mux.Handle("/metrics", prometheus.Handler())
+	// TODO: connect ErrorLog to logrus
+	srv := &Server{
+		config:   c,
+		server:   &http.Server{Handler: mux},
+		doneChan: make(chan struct{}),
 	}
-	return s, nil
+
+	return srv, nil
 }
 
 // Start the API server and listens for requests.
-func (s *Server) Start(context.Context) error {
-	http.Handle("/metrics", prometheus.Handler())
+func (s *Server) Start() error {
+	ln, err := net.Listen("tcp", s.config.Addr)
+	if err != nil {
+		return err
+	}
 
 	log.Info("Starting API server")
-	go http.ListenAndServe(s.config.Addr, nil)
+	go func() {
+		s.err = s.server.Serve(ln)
+		close(s.doneChan)
+		log.Info("API server stopped")
+	}()
 	log.Info("API server started")
 
 	return nil
+}
+
+// Err returns an error object after the server has stopped.
+func (s *Server) Err(ctx context.Context) error {
+	select {
+	case <-s.doneChan:
+		return s.err
+	case <-ctx.Done():
+		return ctx.Err()
+	}
 }

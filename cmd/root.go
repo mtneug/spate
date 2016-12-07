@@ -22,7 +22,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/mtneug/spate/api"
-	"github.com/mtneug/spate/autoscaler"
+	"github.com/mtneug/spate/controller"
 	"github.com/mtneug/spate/docker"
 	"github.com/mtneug/spate/version"
 	"github.com/spf13/cobra"
@@ -79,24 +79,24 @@ var rootCmd = &cobra.Command{
 		}
 
 		// API server
-		a, err := api.New(&api.Config{
+		srv, err := api.New(&api.Config{
 			Addr: addr,
 		})
 		if err != nil {
 			return err
 		}
 
-		if err = a.Start(ctx); err != nil {
+		if err = srv.Start(); err != nil {
 			return err
 		}
 
-		// Scaler
-		s, err := autoscaler.New(&autoscaler.Config{})
+		// Controller
+		ctrl, err := controller.New(&controller.Config{})
 		if err != nil {
 			return err
 		}
 
-		if err := s.Start(ctx); err != nil {
+		if err = ctrl.Start(ctx); err != nil {
 			return err
 		}
 
@@ -105,10 +105,10 @@ var rootCmd = &cobra.Command{
 		signal.Notify(sig, os.Interrupt)
 		go func() {
 			<-sig
-			_ = s.Stop(ctx)
+			_ = ctrl.Stop(ctx)
 		}()
 
-		return s.Err(ctx)
+		return ctrl.Err(ctx)
 	},
 }
 

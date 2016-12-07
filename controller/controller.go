@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package autoscaler
+package controller
 
 import (
 	"context"
@@ -24,20 +24,20 @@ import (
 )
 
 var (
-	// ErrNotStarted indicates that the autoscaler has not been started yet.
-	ErrNotStarted = errors.New("autoscaler: not started")
+	// ErrNotStarted indicates that the controller has not been started yet.
+	ErrNotStarted = errors.New("controller: not started")
 
-	// ErrStarted indicates that the autoscaler was already started once. Note
+	// ErrStarted indicates that the controller was already started once. Note
 	// that it does not indicate whether it is still running.
-	ErrStarted = errors.New("autoscaler: already started once")
+	ErrStarted = errors.New("controller: already started once")
 )
 
-// Config for a autoscaler.
+// Config for a controller.
 type Config struct {
 }
 
-// Autoscaler monitors Docker Swarm services and scales them if needed.
-type Autoscaler struct {
+// Controller monitors Docker Swarm services and scales them if needed.
+type Controller struct {
 	config *Config
 	client *client.Client
 	err    error
@@ -50,14 +50,14 @@ type Autoscaler struct {
 	doneChan  chan struct{}
 }
 
-// New creates a new autoscaler.
-func New(c *Config) (*Autoscaler, error) {
+// New creates a new controller.
+func New(c *Config) (*Controller, error) {
 	cli, err := client.NewEnvClient()
 	if err != nil {
 		return nil, err
 	}
 
-	a := &Autoscaler{
+	a := &Controller{
 		config:    c,
 		client:    cli,
 		startChan: make(chan struct{}),
@@ -68,62 +68,62 @@ func New(c *Config) (*Autoscaler, error) {
 	return a, nil
 }
 
-// Start the autoscaler in the background.
-func (a *Autoscaler) Start(ctx context.Context) error {
+// Start the controller in the background.
+func (c *Controller) Start(ctx context.Context) error {
 	err := ErrStarted
 
-	a.startOnce.Do(func() {
-		log.Info("Starting autostaler")
-		close(a.startChan)
-		go a.run(ctx)
+	c.startOnce.Do(func() {
+		log.Info("Starting controller")
+		go func() {
+			close(c.startChan)
+			log.Info("Controller started")
+			c.err = c.run(ctx)
+			close(c.doneChan)
+			log.Info("Controller stopped")
+		}()
 		err = nil
 	})
 
 	return err
 }
 
-// Stop the autoscaler. After it is stopped, this autoscaler cannot be started
+// Stop the controller. After it is stopped, this controller cannot be started
 // again.
-func (a *Autoscaler) Stop(ctx context.Context) error {
+func (c *Controller) Stop(ctx context.Context) error {
 	select {
-	case <-a.startChan:
+	case <-c.startChan:
 	default:
 		return ErrNotStarted
 	}
 
-	a.stopOnce.Do(func() {
-		log.Info("Stopping autostaler")
-		close(a.stopChan)
+	c.stopOnce.Do(func() {
+		log.Info("Stopping controller")
+		close(c.stopChan)
 	})
 
 	select {
-	case <-a.doneChan:
+	case <-c.doneChan:
 		return nil
 	case <-ctx.Done():
 		return ctx.Err()
 	}
 }
 
-// Err returns an error object after the autoscaler has stopped.
-func (a *Autoscaler) Err(ctx context.Context) error {
+// Err returns an error object after the controller has stopped.
+func (c *Controller) Err(ctx context.Context) error {
 	select {
-	case <-a.doneChan:
-		return a.err
+	case <-c.doneChan:
+		return c.err
 	case <-ctx.Done():
 		return ctx.Err()
 	}
 }
 
-func (a *Autoscaler) run(ctx context.Context) (err error) {
-	defer func() { a.err = err }()
-	defer func() { log.Info("Autoscaler stopped") }()
-
-	log.Info("Autoscaler started")
+func (c *Controller) run(ctx context.Context) (err error) {
 	for {
 		select {
-		case <-a.stopChan:
+		case <-c.stopChan:
 			// TODO: clean up
-			close(a.doneChan)
 			return nil
 		}
 	}
