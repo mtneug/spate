@@ -49,9 +49,9 @@ var rootCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 		if i {
-			version.Spate.PrintFull(os.Stdout)
+			_ = version.Spate.PrintFull(os.Stdout)
 			if docker.Err == nil {
-				docker.PrintInfo(context.Background(), os.Stdout)
+				_ = docker.PrintInfo(context.Background(), os.Stdout)
 			} else {
 				fmt.Println("docker: could not connect")
 			}
@@ -105,7 +105,7 @@ var rootCmd = &cobra.Command{
 		signal.Notify(sig, os.Interrupt)
 		go func() {
 			<-sig
-			s.Stop(ctx)
+			_ = s.Stop(ctx)
 		}()
 
 		return s.Err(ctx)

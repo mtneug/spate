@@ -49,7 +49,10 @@ func TestPrintFull(t *testing.T) {
 	}
 
 	var b bytes.Buffer
-	i.PrintFull(&b)
+	err := i.PrintFull(&b)
+	if err != nil {
+		t.Fatalf("Expected err to be nil, got '%s'", err)
+	}
 
 	got := b.String()
 	want := `myapp:
@@ -63,6 +66,6 @@ func TestPrintFull(t *testing.T) {
 `
 
 	if got != want {
-		t.Errorf("Expected '%s', got '%s'", want, got)
+		t.Fatalf("Expected '%s', got '%s'", want, got)
 	}
 }

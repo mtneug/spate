@@ -21,12 +21,7 @@ import (
 )
 
 func TestInitializeClient(t *testing.T) {
-	if docker.Client != nil {
-		t.Error("Client should be uninitialized at startup")
-	}
-
-	err := docker.InitializeClient()
-	if err != nil {
-		t.Errorf("Client could not be initialized: %v", err)
+	if docker.C == nil || docker.Err != nil {
+		t.Error("Expected client to be initialized")
 	}
 }
