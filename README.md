@@ -1,6 +1,8 @@
-# :ocean: `spate` 
+# :ocean: `spate`
 
+[![GoDoc](https://godoc.org/github.com/mtneug/spate?status.png)](https://godoc.org/github.com/mtneug/spate)
 [![Build Status](https://travis-ci.com/mtneug/spate.svg?token=GBfvMyahwz6qx8tjv3VG&branch=master)](https://travis-ci.com/mtneug/spate)
+[![codecov](https://codecov.io/gh/mtneug/spate/branch/master/graph/badge.svg?token=Q2XAmf6OfS)](https://codecov.io/gh/mtneug/spate)
 
 > **spate** `/speɪt/`  
 > noun
