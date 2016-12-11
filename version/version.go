@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/mtneug/spate/pkg/version"
+	"github.com/mtneug/pkg/version"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
