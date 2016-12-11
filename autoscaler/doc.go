@@ -12,6 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package version contains code for handling (version) information about
-// projects.
-package version
+// Package autoscaler contains the autoscaler implementation.
+package autoscaler

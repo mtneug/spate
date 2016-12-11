@@ -39,7 +39,6 @@ GOMETALINTER_COMMON_ARGS=\
 	--enable=ineffassign \
 	--enable=goconst \
 	--enable=goimports \
-	--enable=dupl \
 	--enable=staticcheck \
 	--enable=unused \
 	--enable=misspell \

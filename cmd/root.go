@@ -16,11 +16,14 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"os/signal"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/mtneug/pkg/startstopper"
 	"github.com/mtneug/spate/api"
 	"github.com/mtneug/spate/controller"
 	"github.com/mtneug/spate/docker"
@@ -33,39 +36,48 @@ var rootCmd = &cobra.Command{
 	Short:         "Horizontal service autoscaler for Docker Swarm mode",
 	SilenceErrors: true,
 	SilenceUsage:  true,
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		flag, err := cmd.Flags().GetString("log-level")
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 		level, err := log.ParseLevel(flag)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 		log.SetLevel(level)
 
+		// info
 		i, err := cmd.Flags().GetBool("info")
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 		if i {
 			_ = version.Spate.PrintFull(os.Stdout)
 			if docker.Err == nil {
 				_ = docker.PrintInfo(context.Background(), os.Stdout)
 			} else {
-				fmt.Println("docker: could not connect")
+				fmt.Println("docker: not connected")
 			}
 			os.Exit(0)
 		}
 
+		// version
 		v, err := cmd.Flags().GetBool("version")
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 		if v {
 			fmt.Println(version.Spate)
 			os.Exit(0)
 		}
+
+		// Check if connected to Docker
+		if docker.Err != nil {
+			return errors.New("cmd: not connected to Docker")
+		}
+
+		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx, cancel := context.WithCancel(context.Background())
@@ -78,6 +90,15 @@ var rootCmd = &cobra.Command{
 			return err
 		}
 
+		ctrlPeriodStr, err := flags.GetString("controller-period")
+		if err != nil {
+			return err
+		}
+		ctrlPeriod, err := time.ParseDuration(ctrlPeriodStr)
+		if err != nil {
+			return err
+		}
+
 		// API server
 		srv, err := api.New(&api.Config{
 			Addr: addr,
@@ -85,17 +106,16 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-
 		if err = srv.Start(); err != nil {
 			return err
 		}
 
 		// Controller
-		ctrl, err := controller.New(&controller.Config{})
+		store := startstopper.NewInMemoryMap()
+		ctrl, err := controller.New(ctrlPeriod, store)
 		if err != nil {
 			return err
 		}
-
 		if err = ctrl.Start(ctx); err != nil {
 			return err
 		}
@@ -105,17 +125,20 @@ var rootCmd = &cobra.Command{
 		signal.Notify(sig, os.Interrupt)
 		go func() {
 			<-sig
+			log.Info("Shutting down")
 			_ = ctrl.Stop(ctx)
 		}()
 
+		log.Info("Ready")
 		return ctrl.Err(ctx)
 	},
 }
 
 func init() {
+	rootCmd.Flags().String("controller-period", "5s", "How often the controller looks for changes")
 	rootCmd.Flags().Bool("info", false, "Print spate environment information and exit")
 	rootCmd.Flags().String("listen-address", ":8080", "Interface to bind to")
-	rootCmd.Flags().String("log-level", "info", `Log level ("debug", "info", "warn", "error", "fatal", "panic")`)
+	rootCmd.Flags().String("log-level", "info", "Log level ('debug', 'info', 'warn', 'error', 'fatal', 'panic')")
 	rootCmd.Flags().BoolP("version", "v", false, "Print the version and exit")
 }
 
