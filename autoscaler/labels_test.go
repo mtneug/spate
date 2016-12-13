@@ -109,12 +109,11 @@ func TestNew(t *testing.T) {
 				Labels: map[string]string{
 					"de.mtneug.spate.metric.cpu.type":    "cpu",
 					"de.mtneug.spate.metric.memory.type": "memory",
-					"de.mtneug.spate.metric.custom.type": "prometheus",
 				},
 			},
 		},
 	}
-	_, err := New(srv)
-	// require.Nil(t, a)
+	a, err := New(srv)
+	require.NotEmpty(t, a)
 	require.NoError(t, err)
 }
