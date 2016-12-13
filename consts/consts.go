@@ -20,4 +20,10 @@ const (
 
 	// LabelSpate is the service label used to activate spate.
 	LabelSpate = "de.mtneug.spate"
+
+	// LabelMetricSuffix is the suffix LabelSpate for metrics.
+	LabelMetricSuffix = "metric"
+
+	// LabelMetricTypeSuffix is the suffix (after metric name) for the type.
+	LabelMetricTypeSuffix = "type"
 )
