@@ -18,14 +18,25 @@ package types
 type MetricType string
 
 const (
-	// MetricTypeCPU is a CPUMetric
+	// MetricTypeCPU is a CPU metric.
 	MetricTypeCPU MetricType = "cpu"
 
-	// MetricTypeMemory is a MemoryMetric
+	// MetricTypeMemory is a memory metric.
 	MetricTypeMemory MetricType = "memory"
 
-	// MetricTypePrometheus is a PrometheusMetric
+	// MetricTypePrometheus is a Prometheus metric.
 	MetricTypePrometheus MetricType = "prometheus"
+)
+
+// MetricKind represents some kind of metric.
+type MetricKind string
+
+const (
+	// MetricKindReplica is a replica metric.
+	MetricKindReplica MetricKind = "replica"
+
+	// MetricKindSystem is a system metric.
+	MetricKindSystem MetricKind = "system"
 )
 
 // Metric represents a service metric.
@@ -36,4 +47,6 @@ type Metric struct {
 	Name string
 	// Type of the metric.
 	Type MetricType
+	// Kind of the metric.
+	Kind MetricKind
 }
