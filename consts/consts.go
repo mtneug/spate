@@ -26,4 +26,7 @@ const (
 
 	// LabelMetricTypeSuffix is the suffix (after metric name) for the type.
 	LabelMetricTypeSuffix = "type"
+
+	// LabelMetricKindSuffix is the suffix (after metric name) for the kind.
+	LabelMetricKindSuffix = "kind"
 )
