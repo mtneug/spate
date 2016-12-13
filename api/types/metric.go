@@ -12,18 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package consts
+package types
+
+// MetricType represents some category of metrics.
+type MetricType string
 
 const (
-	// Enable in string form.
-	Enable = "enable"
+	// MetricTypeCPU is a CPUMetric
+	MetricTypeCPU MetricType = "cpu"
 
-	// LabelSpate is the service label used to activate spate.
-	LabelSpate = "de.mtneug.spate"
+	// MetricTypeMemory is a MemoryMetric
+	MetricTypeMemory MetricType = "memory"
 
-	// LabelMetricSuffix is the suffix LabelSpate for metrics.
-	LabelMetricSuffix = "metric"
-
-	// LabelMetricTypeSuffix is the suffix (after metric name) for the type.
-	LabelMetricTypeSuffix = "type"
+	// MetricTypePrometheus is a PrometheusMetric
+	MetricTypePrometheus MetricType = "prometheus"
 )
+
+// Metric represents a service metric.
+type Metric struct {
+	// ID of the metric.
+	ID string
+	// Name of the metric.
+	Name string
+	// Type of the metric.
+	Type MetricType
+}

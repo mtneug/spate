@@ -88,6 +88,13 @@ func TestHandleEventServiceCreated(t *testing.T) {
 
 	srv := swarm.Service{
 		ID: "testSrv",
+		Spec: swarm.ServiceSpec{
+			Annotations: swarm.Annotations{
+				Labels: map[string]string{
+					"de.mtneug.spate.metric.cpu.type": "cpu",
+				},
+			},
+		},
 	}
 	e := types.Event{
 		ID:     "test",
@@ -111,6 +118,13 @@ func TestHandleEventServiceUpdated(t *testing.T) {
 
 	srv := swarm.Service{
 		ID: "testSrv",
+		Spec: swarm.ServiceSpec{
+			Annotations: swarm.Annotations{
+				Labels: map[string]string{
+					"de.mtneug.spate.metric.cpu.type": "cpu",
+				},
+			},
+		},
 	}
 	e := types.Event{
 		ID:     "test",

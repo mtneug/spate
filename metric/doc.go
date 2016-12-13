@@ -12,18 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package consts
-
-const (
-	// Enable in string form.
-	Enable = "enable"
-
-	// LabelSpate is the service label used to activate spate.
-	LabelSpate = "de.mtneug.spate"
-
-	// LabelMetricSuffix is the suffix LabelSpate for metrics.
-	LabelMetricSuffix = "metric"
-
-	// LabelMetricTypeSuffix is the suffix (after metric name) for the type.
-	LabelMetricTypeSuffix = "type"
-)
+// Package metric contains code related to service metrics.
+package metric

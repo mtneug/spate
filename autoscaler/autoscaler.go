@@ -36,6 +36,12 @@ func New(srv swarm.Service) (*Autoscaler, error) {
 		Service: srv,
 	}
 	a.StartStopper = startstopper.NewGo(startstopper.RunnerFunc(a.run))
+
+	err := a.processLabels()
+	if err != nil {
+		return nil, err
+	}
+
 	return a, nil
 }
 
