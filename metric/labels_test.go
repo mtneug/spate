@@ -18,64 +18,138 @@ import (
 	"testing"
 
 	"github.com/mtneug/spate/api/types"
-	"github.com/mtneug/spate/consts"
 	"github.com/mtneug/spate/metric"
 	"github.com/stretchr/testify/require"
 )
 
-func TestNewByLabelsNoType(t *testing.T) {
+func TestNewByLabels(t *testing.T) {
 	t.Parallel()
 
-	_, err := metric.NewByLabels("test", nil)
-	require.EqualError(t, err, metric.ErrNoType.Error())
-}
+	testCases := []struct {
+		name   string
+		label  map[string]string
+		err    error
+		metric types.Metric
+	}{
+		{
+			name:   "test",
+			label:  nil,
+			err:    metric.ErrNoType,
+			metric: types.Metric{},
+		},
+		{
+			name: "test",
+			label: map[string]string{
+				"type": "unknown",
+			},
+			err:    metric.ErrUnknownType,
+			metric: types.Metric{},
+		},
 
-func TestNewByLabelsUnknownType(t *testing.T) {
-	t.Parallel()
+		// CPU
+		{
+			name: "test",
+			label: map[string]string{
+				"type": "cpu",
+			},
+			err: nil,
+			metric: types.Metric{
+				Name: "test",
+				Type: types.MetricTypeCPU,
+				Kind: types.MetricKindReplica,
+			},
+		},
+		{
+			name: "test",
+			label: map[string]string{
+				"type": "cpu",
+				"kind": "system",
+			},
+			err: metric.ErrWrongKind,
+			metric: types.Metric{
+				Name: "test",
+				Type: types.MetricTypeCPU,
+				Kind: types.MetricKindReplica,
+			},
+		},
 
-	l := map[string]string{
-		consts.LabelMetricTypeSuffix: "unknown",
+		// memory
+		{
+			name: "test",
+			label: map[string]string{
+				"type": "memory",
+			},
+			err: nil,
+			metric: types.Metric{
+				Name: "test",
+				Type: types.MetricTypeMemory,
+				Kind: types.MetricKindReplica,
+			},
+		},
+		{
+			name: "test",
+			label: map[string]string{
+				"type": "memory",
+				"kind": "system",
+			},
+			err: metric.ErrWrongKind,
+			metric: types.Metric{
+				Name: "test",
+				Type: types.MetricTypeMemory,
+				Kind: types.MetricKindReplica,
+			},
+		},
+
+		// prometheus
+		{
+			name: "test",
+			label: map[string]string{
+				"type": "prometheus",
+			},
+			err:    metric.ErrNoKind,
+			metric: types.Metric{},
+		},
+		{
+			name: "test",
+			label: map[string]string{
+				"type": "prometheus",
+				"kind": "unknown",
+			},
+			err:    metric.ErrUnknownKind,
+			metric: types.Metric{},
+		},
+		{
+			name: "test",
+			label: map[string]string{
+				"type": "prometheus",
+				"kind": "system",
+			},
+			err: nil,
+			metric: types.Metric{
+				Name: "test",
+				Type: types.MetricTypePrometheus,
+				Kind: types.MetricKindSystem,
+			},
+		},
+		{
+			name: "test",
+			label: map[string]string{
+				"type": "prometheus",
+				"kind": "replica",
+			},
+			err: nil,
+			metric: types.Metric{
+				Name: "test",
+				Type: types.MetricTypePrometheus,
+				Kind: types.MetricKindReplica,
+			},
+		},
 	}
 
-	_, err := metric.NewByLabels("test", l)
-	require.EqualError(t, err, metric.ErrUnknownType.Error())
-}
-
-func TestNewByLabelsMetricTypeCPU(t *testing.T) {
-	t.Parallel()
-
-	l := map[string]string{
-		consts.LabelMetricTypeSuffix: string(types.MetricTypeCPU),
+	for _, c := range testCases {
+		m, err := metric.NewByLabels(c.name, c.label)
+		m.ID = ""
+		require.Equal(t, c.err, err)
+		require.Equal(t, c.metric, m)
 	}
-
-	m, err := metric.NewByLabels("test", l)
-	require.NoError(t, err)
-	require.Equal(t, "test", m.Name)
-	require.Equal(t, types.MetricTypeCPU, m.Type)
-}
-
-func TestNewByLabelsMetricTypeMemory(t *testing.T) {
-	t.Parallel()
-
-	l := map[string]string{
-		consts.LabelMetricTypeSuffix: string(types.MetricTypeMemory),
-	}
-
-	m, err := metric.NewByLabels("test", l)
-	require.NoError(t, err)
-	require.Equal(t, "test", m.Name)
-	require.Equal(t, types.MetricTypeMemory, m.Type)
-}
-
-func TestNewByLabelsMetricTypePrometheus(t *testing.T) {
-	t.Parallel()
-
-	l := map[string]string{
-		consts.LabelMetricTypeSuffix: string(types.MetricTypePrometheus),
-	}
-
-	m, err := metric.NewByLabels("test", l)
-	require.NoError(t, err)
-	require.Equal(t, "test", m.Name)
-	require.Equal(t, types.MetricTypePrometheus, m.Type)
 }
