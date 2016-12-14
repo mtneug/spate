@@ -14,6 +14,8 @@
 
 package types
 
+import "net/url"
+
 // MetricType represents some category of metrics.
 type MetricType string
 
@@ -49,4 +51,14 @@ type Metric struct {
 	Type MetricType
 	// Kind of the metric.
 	Kind MetricKind
+	// Prometheus spec.
+	Prometheus PrometheusSpec
+}
+
+// PrometheusSpec specifies a Prometheus metric.
+type PrometheusSpec struct {
+	// Endpoint of the Prometheus metrics.
+	Endpoint url.URL
+	// Name of the Prometheus metrics.
+	Name string
 }
