@@ -15,6 +15,7 @@
 package metric_test
 
 import (
+	"net/url"
 	"testing"
 
 	"github.com/mtneug/spate/api/types"
@@ -24,6 +25,9 @@ import (
 
 func TestNewByLabels(t *testing.T) {
 	t.Parallel()
+
+	testUrlStr := "http://localhost:8080/metrics?test=1"
+	testUrl, _ := url.Parse(testUrlStr)
 
 	testCases := []struct {
 		name   string
@@ -100,7 +104,7 @@ func TestNewByLabels(t *testing.T) {
 			},
 		},
 
-		// prometheus
+		// Prometheus
 		{
 			name: "test",
 			label: map[string]string{
@@ -124,24 +128,65 @@ func TestNewByLabels(t *testing.T) {
 				"type": "prometheus",
 				"kind": "system",
 			},
+			err:    metric.ErrNoPrometheusEndpoint,
+			metric: types.Metric{},
+		},
+		{
+			name: "test",
+			label: map[string]string{
+				"type":                "prometheus",
+				"kind":                "system",
+				"prometheus.endpoint": "ftp://why",
+			},
+			err:    metric.ErrPrometheusEndpointNotHTTPUrl,
+			metric: types.Metric{},
+		},
+		{
+			name: "test",
+			label: map[string]string{
+				"type":                "prometheus",
+				"kind":                "system",
+				"prometheus.endpoint": testUrlStr,
+			},
+			err:    metric.ErrNoPrometheusMetricName,
+			metric: types.Metric{},
+		},
+		{
+			name: "test",
+			label: map[string]string{
+				"type":                "prometheus",
+				"kind":                "system",
+				"prometheus.endpoint": testUrlStr,
+				"prometheus.name":     "test_metric",
+			},
 			err: nil,
 			metric: types.Metric{
 				Name: "test",
 				Type: types.MetricTypePrometheus,
 				Kind: types.MetricKindSystem,
+				Prometheus: types.PrometheusSpec{
+					Endpoint: *testUrl,
+					Name:     "test_metric",
+				},
 			},
 		},
 		{
 			name: "test",
 			label: map[string]string{
-				"type": "prometheus",
-				"kind": "replica",
+				"type":                "prometheus",
+				"kind":                "replica",
+				"prometheus.endpoint": testUrlStr,
+				"prometheus.name":     "test_metric",
 			},
 			err: nil,
 			metric: types.Metric{
 				Name: "test",
 				Type: types.MetricTypePrometheus,
 				Kind: types.MetricKindReplica,
+				Prometheus: types.PrometheusSpec{
+					Endpoint: *testUrl,
+					Name:     "test_metric",
+				},
 			},
 		},
 	}
