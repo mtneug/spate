@@ -29,4 +29,12 @@ const (
 
 	// LabelMetricKindSuffix is the suffix (after metric name) for the kind.
 	LabelMetricKindSuffix = "kind"
+
+	// LabelMetricPrometheusEndpointSuffix is the suffix (after metric name) for
+	// the Prometheus endpoint.
+	LabelMetricPrometheusEndpointSuffix = "prometheus.endpoint"
+
+	// LabelMetricPrometheusNameSuffix is the suffix (after metric name) for the
+	// Prometheus metric name.
+	LabelMetricPrometheusNameSuffix = "prometheus.name"
 )

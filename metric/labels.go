@@ -16,6 +16,7 @@ package metric
 
 import (
 	"errors"
+	"net/url"
 
 	"github.com/mtneug/pkg/ulid"
 	"github.com/mtneug/spate/api/types"
@@ -43,6 +44,18 @@ var (
 	// metric types this can be automatically corrected so that the metric still
 	// can be created.
 	ErrWrongKind = errors.New("metric: wrong kind")
+
+	// ErrNoPrometheusEndpoint indicates that the metric could not be created
+	// because no Prometheus endpoint was specified.
+	ErrNoPrometheusEndpoint = errors.New("metric: no Prometheus endpoint specified")
+
+	// ErrPrometheusEndpointNotHTTPUrl indicates that the metric could not be
+	// created because the specified Prometheus endpoint is not a HTTP URL.
+	ErrPrometheusEndpointNotHTTPUrl = errors.New("metric: Prometheus endpoint is not a HTTP URL")
+
+	// ErrNoPrometheusMetricName indicates that the metric could not be created
+	// because no Prometheus metric name was specified.
+	ErrNoPrometheusMetricName = errors.New("metric: no Prometheus metric name specified")
 
 	emptyMetric = types.Metric{}
 
@@ -111,6 +124,7 @@ func newPrometheusMetricByLabels(name string, label map[string]string) (m types.
 	m.ID = ulid.New().String()
 	m.Name = name
 
+	// Kind
 	k, ok := label[consts.LabelMetricKindSuffix]
 	if !ok {
 		return emptyMetric, ErrNoKind
@@ -123,6 +137,24 @@ func newPrometheusMetricByLabels(name string, label map[string]string) (m types.
 	default:
 		return emptyMetric, ErrUnknownKind
 	}
+
+	// Prometheus endpoint
+	endpointStr, ok := label[consts.LabelMetricPrometheusEndpointSuffix]
+	if !ok {
+		return emptyMetric, ErrNoPrometheusEndpoint
+	}
+	endpoint, err := url.Parse(endpointStr)
+	if err != nil || endpoint.Scheme != "http" {
+		return emptyMetric, ErrPrometheusEndpointNotHTTPUrl
+	}
+	m.Prometheus.Endpoint = *endpoint
+
+	// Prometheus metric name
+	prometheusName, ok := label[consts.LabelMetricPrometheusNameSuffix]
+	if !ok {
+		return emptyMetric, ErrNoPrometheusMetricName
+	}
+	m.Prometheus.Name = prometheusName
 
 	return
 }
