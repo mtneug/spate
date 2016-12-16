@@ -27,15 +27,16 @@ import (
 	"github.com/mtneug/pkg/ulid"
 	"github.com/mtneug/spate/api/types"
 	"github.com/mtneug/spate/autoscaler"
-	"github.com/mtneug/spate/consts"
 	"github.com/mtneug/spate/docker"
 )
+
+const labelSpate = "de.mtneug.spate"
 
 var serviceListOptions dockerTypes.ServiceListOptions
 
 func init() {
 	f := filters.NewArgs()
-	f.Add("label", fmt.Sprintf("%s=%s", consts.LabelSpate, consts.Enable))
+	f.Add("label", fmt.Sprintf("%s=%s", labelSpate, "enable"))
 	serviceListOptions = dockerTypes.ServiceListOptions{Filter: f}
 }
 

@@ -95,19 +95,12 @@ func (el *eventLoop) handleEvent(ctx context.Context, e types.Event) {
 }
 
 func (el *eventLoop) addAutoscaler(ctx context.Context, srv swarm.Service) (bool, error) {
-	a, err := autoscaler.New(srv)
-	if err != nil {
-		return false, err
-	}
-
+	a := autoscaler.New(srv, nil)
 	return el.autoscalers.AddAndStart(ctx, srv.ID, a)
 }
 
 func (el *eventLoop) updateAutoscaler(ctx context.Context, srv swarm.Service) (bool, error) {
-	a, err := autoscaler.New(srv)
-	if err != nil {
-		return false, err
-	}
+	a := autoscaler.New(srv, nil)
 	a.Update = true
 
 	return el.autoscalers.UpdateAndRestart(ctx, srv.ID, a)
