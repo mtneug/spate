@@ -279,6 +279,15 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/mtneug/pkg/reducer",
+			"repository": "https://github.com/mtneug/pkg",
+			"vcs": "git",
+			"revision": "9734d2353fc2a7e2203bdca943fc4a6f7748e883",
+			"branch": "master",
+			"path": "/reducer",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/mtneug/pkg/startstopper",
 			"repository": "https://github.com/mtneug/pkg",
 			"vcs": "git",
