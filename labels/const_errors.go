@@ -17,6 +17,10 @@ package labels
 import "errors"
 
 var (
+	// ErrInvalidMetricLabel indicates that the parsing failed because the metric
+	// label is invalid.
+	ErrInvalidMetricLabel = errors.New("labels: metric label invalid")
+
 	// ErrNoType indicates that the parsing failed because no type was specified.
 	ErrNoType = errors.New("labels: no type specified")
 

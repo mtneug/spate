@@ -16,6 +16,13 @@ package labels
 
 const (
 	//
+	// Spate
+	//
+
+	// Namespace for spate
+	Namespace = "de.mtneug.spate"
+
+	//
 	// Autoscaler
 	//
 
