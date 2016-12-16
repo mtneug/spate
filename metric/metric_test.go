@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package metric
+package metric_test
 
 import (
-	"github.com/mtneug/pkg/ulid"
-	"github.com/mtneug/spate/api/types"
+	"testing"
+
+	"github.com/mtneug/spate/metric"
+	"github.com/stretchr/testify/require"
 )
 
-// New creates a new metric.
-func New(name string) types.Metric {
-	m := types.Metric{
-		ID:   ulid.New().String(),
-		Name: name,
-	}
-	return m
+func TestNew(t *testing.T) {
+	m := metric.New("test")
+	require.NotEmpty(t, m.ID)
+	require.Equal(t, m.Name, "test")
 }
