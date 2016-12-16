@@ -22,7 +22,6 @@ import (
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/mtneug/pkg/startstopper"
 	"github.com/mtneug/spate/api/types"
-	"github.com/mtneug/spate/autoscaler"
 )
 
 type eventLoop struct {
@@ -95,12 +94,19 @@ func (el *eventLoop) handleEvent(ctx context.Context, e types.Event) {
 }
 
 func (el *eventLoop) addAutoscaler(ctx context.Context, srv swarm.Service) (bool, error) {
-	a := autoscaler.New(srv, nil)
+	a, err := constructAutoscaler(srv)
+	if err != nil {
+		return false, err
+	}
+
 	return el.autoscalers.AddAndStart(ctx, srv.ID, a)
 }
 
 func (el *eventLoop) updateAutoscaler(ctx context.Context, srv swarm.Service) (bool, error) {
-	a := autoscaler.New(srv, nil)
+	a, err := constructAutoscaler(srv)
+	if err != nil {
+		return false, err
+	}
 	a.Update = true
 
 	return el.autoscalers.UpdateAndRestart(ctx, srv.ID, a)
