@@ -14,11 +14,33 @@
 
 package metric
 
-import "github.com/mtneug/spate/api/types"
+import (
+	"errors"
+
+	"github.com/mtneug/spate/api/types"
+)
+
+// ErrUnknownType indicates that the type is unknown.
+var ErrUnknownType = errors.New("metric: unknown type")
 
 // Measurer measures a metric for a given service.
 type Measurer interface {
 	Measure() (float64, error)
+}
+
+// NewMeasurer creates the right measurer for given metric.
+func NewMeasurer(serviceID string, metric types.Metric) (measurer Measurer, err error) {
+	switch metric.Type {
+	case types.MetricTypeCPU:
+		measurer = &CPUMeasurer{ServiceID: serviceID, Metric: metric}
+	case types.MetricTypeMemory:
+		measurer = &MemoryMeasurer{ServiceID: serviceID, Metric: metric}
+	case types.MetricTypePrometheus:
+		measurer = &PrometheusMeasurer{ServiceID: serviceID, Metric: metric}
+	default:
+		err = ErrUnknownType
+	}
+	return
 }
 
 // CPUMeasurer measures the CPU utilization.
