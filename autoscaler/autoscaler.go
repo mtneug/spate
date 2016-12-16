@@ -16,9 +16,11 @@ package autoscaler
 
 import (
 	"context"
+	"time"
 
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/mtneug/pkg/startstopper"
+	"github.com/mtneug/spate/metric"
 )
 
 // Autoscaler observes one Docker Swarm service and automatically scales it
@@ -26,23 +28,28 @@ import (
 type Autoscaler struct {
 	startstopper.StartStopper
 
-	Service swarm.Service
-	Update  bool
+	Service  swarm.Service
+	Update   bool
+	Observer []metric.Observer
+
+	Period                 time.Duration
+	CooldownScaledUp       time.Duration
+	CooldownScaledDown     time.Duration
+	CooldownServiceAdded   time.Duration
+	CooldownServiceUpdated time.Duration
+
+	MaxReplicas uint64
+	MinReplicas uint64
 }
 
 // New creates an autoscaler for the given service.
-func New(srv swarm.Service) (*Autoscaler, error) {
+func New(srv swarm.Service, observer []metric.Observer) *Autoscaler {
 	a := &Autoscaler{
-		Service: srv,
+		Service:  srv,
+		Observer: observer,
 	}
 	a.StartStopper = startstopper.NewGo(startstopper.RunnerFunc(a.run))
-
-	err := a.processLabels()
-	if err != nil {
-		return nil, err
-	}
-
-	return a, nil
+	return a
 }
 
 func (a *Autoscaler) run(ctx context.Context, stopChan <-chan struct{}) error {
