@@ -37,18 +37,20 @@ var rootCmd = &cobra.Command{
 	SilenceErrors: true,
 	SilenceUsage:  true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		flag, err := cmd.Flags().GetString("log-level")
+		flags := cmd.Flags()
+
+		levelStr, err := flags.GetString("log-level")
 		if err != nil {
 			return err
 		}
-		level, err := log.ParseLevel(flag)
+		level, err := log.ParseLevel(levelStr)
 		if err != nil {
 			return err
 		}
 		log.SetLevel(level)
 
 		// info
-		i, err := cmd.Flags().GetBool("info")
+		i, err := flags.GetBool("info")
 		if err != nil {
 			return err
 		}
@@ -63,7 +65,7 @@ var rootCmd = &cobra.Command{
 		}
 
 		// version
-		v, err := cmd.Flags().GetBool("version")
+		v, err := flags.GetBool("version")
 		if err != nil {
 			return err
 		}
@@ -75,6 +77,12 @@ var rootCmd = &cobra.Command{
 		// Check if connected to Docker
 		if docker.Err != nil {
 			return errors.New("cmd: not connected to Docker")
+		}
+
+		// Set defaults
+		err = readAndSetDefaults(flags)
+		if err != nil {
+			return err
 		}
 
 		return nil
