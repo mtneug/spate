@@ -12,5 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package consts contains constant values used in spate.
-package consts
+// Package labels contains code for parsing spate service labels an constructing
+// objects out of them.
+package labels
