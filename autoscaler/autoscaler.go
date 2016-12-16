@@ -20,17 +20,24 @@ import (
 
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/mtneug/pkg/startstopper"
+	"github.com/mtneug/spate/api/types"
 	"github.com/mtneug/spate/metric"
 )
+
+// Goal consist of an observer and a target.
+type Goal struct {
+	Observer *metric.Observer
+	Target   types.Target
+}
 
 // Autoscaler observes one Docker Swarm service and automatically scales it
 // depending on defined metrics.
 type Autoscaler struct {
 	startstopper.StartStopper
 
-	Service  swarm.Service
-	Update   bool
-	Observer []metric.Observer
+	Service swarm.Service
+	Update  bool
+	Goals   []Goal
 
 	Period                 time.Duration
 	CooldownScaledUp       time.Duration
@@ -43,10 +50,10 @@ type Autoscaler struct {
 }
 
 // New creates an autoscaler for the given service.
-func New(srv swarm.Service, observer []metric.Observer) *Autoscaler {
+func New(srv swarm.Service, goal []Goal) *Autoscaler {
 	a := &Autoscaler{
-		Service:  srv,
-		Observer: observer,
+		Service: srv,
+		Goals:   goal,
 	}
 	a.StartStopper = startstopper.NewGo(startstopper.RunnerFunc(a.run))
 	return a

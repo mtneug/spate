@@ -19,7 +19,6 @@ import (
 
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/mtneug/spate/autoscaler"
-	"github.com/mtneug/spate/metric"
 	"github.com/stretchr/testify/require"
 )
 
@@ -27,9 +26,9 @@ import (
 
 func TestNew(t *testing.T) {
 	srv := swarm.Service{}
-	observer := make([]metric.Observer, 0)
+	goals := make([]autoscaler.Goal, 0)
 
-	a := autoscaler.New(srv, observer)
+	a := autoscaler.New(srv, goals)
 	require.Equal(t, srv, a.Service)
-	require.Equal(t, observer, a.Observer)
+	require.Equal(t, goals, a.Goals)
 }
