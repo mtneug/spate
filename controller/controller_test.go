@@ -16,14 +16,12 @@ package controller
 
 import (
 	"context"
-	"errors"
 	"testing"
 	"time"
 
 	"github.com/mtneug/pkg/startstopper"
 	"github.com/mtneug/pkg/startstopper/testutils"
 	"github.com/stretchr/testify/require"
-	"github.com/stretchr/testify/suite"
 )
 
 func TestNew(t *testing.T) {
@@ -43,138 +41,36 @@ func TestNew(t *testing.T) {
 	require.Equal(t, p, cl.period)
 }
 
-type ControllerTestSuite struct {
-	suite.Suite
-
-	ctx        context.Context
-	eventLoop  *testutils.MockStartStopper
-	changeLoop *testutils.MockStartStopper
-	ctrl       *Controller
-}
-
-func (s *ControllerTestSuite) SetupTest() {
-	s.ctx = context.Background()
-
-	s.changeLoop = &testutils.MockStartStopper{}
-	s.eventLoop = &testutils.MockStartStopper{}
-	s.ctrl, _ = New(time.Second, startstopper.NewInMemoryMap())
-	s.ctrl.changeLoop = s.changeLoop
-	s.ctrl.eventLoop = s.eventLoop
-}
-
-func (s *ControllerTestSuite) TestRun() {
-	s.changeLoop.On("Start", s.ctx).Return(nil).Once()
-	s.changeLoop.On("Stop", s.ctx).Return(nil).Once()
-	s.eventLoop.On("Start", s.ctx).Return(nil).Once()
-	s.eventLoop.On("Stop", s.ctx).Return(nil).Once()
-
-	err := s.ctrl.Start(s.ctx)
-	require.NoError(s.T(), err)
-
-	err = s.ctrl.Stop(s.ctx)
-	require.NoError(s.T(), err)
-
-	s.changeLoop.AssertExpectations(s.T())
-	s.eventLoop.AssertExpectations(s.T())
-}
-
-func (s *ControllerTestSuite) TestRunCLStartErr() {
-	s.changeLoop.On("Start", s.ctx).Return(errors.New("cl start")).Once()
-
-	err := s.ctrl.Start(s.ctx)
-	require.NoError(s.T(), err)
-
-	err = s.ctrl.Stop(s.ctx)
-	require.NoError(s.T(), err)
-
-	select {
-	case <-s.ctrl.Done():
-	case <-time.After(time.Second):
-		s.T().Fatal("Did not stop after 1s")
-	}
-
-	err = s.ctrl.Err(s.ctx)
-	require.EqualError(s.T(), err, "cl start")
-
-	s.changeLoop.AssertExpectations(s.T())
-	s.eventLoop.AssertExpectations(s.T())
-}
-
-func (s *ControllerTestSuite) TestRunELStartErr() {
-	s.changeLoop.On("Start", s.ctx).Return(nil).Once()
-	s.changeLoop.On("Stop", s.ctx).Return(nil).Once()
-	s.eventLoop.On("Start", s.ctx).Return(errors.New("el start")).Once()
-
-	err := s.ctrl.Start(s.ctx)
-	require.NoError(s.T(), err)
-
-	err = s.ctrl.Stop(s.ctx)
-	require.NoError(s.T(), err)
-
-	select {
-	case <-s.ctrl.Done():
-	case <-time.After(time.Second):
-		s.T().Fatal("Did not stop after 1s")
-	}
-
-	err = s.ctrl.Err(s.ctx)
-	require.EqualError(s.T(), err, "el start")
-
-	s.changeLoop.AssertExpectations(s.T())
-	s.eventLoop.AssertExpectations(s.T())
-}
-
-func (s *ControllerTestSuite) TestRunCLStopErr() {
-	s.changeLoop.On("Start", s.ctx).Return(nil).Once()
-	s.changeLoop.On("Stop", s.ctx).Return(errors.New("cl stop")).Once()
-	s.eventLoop.On("Start", s.ctx).Return(nil).Once()
-	s.eventLoop.On("Stop", s.ctx).Return(nil).Once()
-
-	err := s.ctrl.Start(s.ctx)
-	require.NoError(s.T(), err)
-
-	err = s.ctrl.Stop(s.ctx)
-	require.NoError(s.T(), err)
-
-	select {
-	case <-s.ctrl.Done():
-	case <-time.After(time.Second):
-		s.T().Fatal("Did not stop after 1s")
-	}
-
-	err = s.ctrl.Err(s.ctx)
-	require.EqualError(s.T(), err, "cl stop")
-
-	s.changeLoop.AssertExpectations(s.T())
-	s.eventLoop.AssertExpectations(s.T())
-}
-
-func (s *ControllerTestSuite) TestRunELStopErr() {
-	s.changeLoop.On("Start", s.ctx).Return(nil).Once()
-	s.changeLoop.On("Stop", s.ctx).Return(nil).Once()
-	s.eventLoop.On("Start", s.ctx).Return(nil).Once()
-	s.eventLoop.On("Stop", s.ctx).Return(errors.New("el stop")).Once()
-
-	err := s.ctrl.Start(s.ctx)
-	require.NoError(s.T(), err)
-
-	err = s.ctrl.Stop(s.ctx)
-	require.NoError(s.T(), err)
-
-	select {
-	case <-s.ctrl.Done():
-	case <-time.After(time.Second):
-		s.T().Fatal("Did not stop after 1s")
-	}
-
-	err = s.ctrl.Err(s.ctx)
-	require.EqualError(s.T(), err, "el stop")
-
-	s.changeLoop.AssertExpectations(s.T())
-	s.eventLoop.AssertExpectations(s.T())
-}
-
 func TestController(t *testing.T) {
-	t.Parallel()
-	suite.Run(t, &ControllerTestSuite{})
+	ctx := context.Background()
+
+	changeLoop := &testutils.MockStartStopper{}
+	changeLoop.On("Start", ctx).Return(nil).Once()
+	changeLoop.On("Stop", ctx).Return(nil).Once()
+
+	eventLoop := &testutils.MockStartStopper{}
+	eventLoop.On("Start", ctx).Return(nil).Once()
+	eventLoop.On("Stop", ctx).Return(nil).Once()
+
+	ctrl, _ := New(time.Second, startstopper.NewInMemoryMap())
+	ctrl.changeLoop = changeLoop
+	ctrl.eventLoop = eventLoop
+
+	err := ctrl.Start(ctx)
+	require.NoError(t, err)
+
+	err = ctrl.Stop(ctx)
+	require.NoError(t, err)
+
+	select {
+	case <-ctrl.Done():
+	case <-time.After(time.Second):
+		t.Fatal("Runner not stopped")
+	}
+
+	err = ctrl.Err(ctx)
+	require.NoError(t, err)
+
+	changeLoop.AssertExpectations(t)
+	eventLoop.AssertExpectations(t)
 }

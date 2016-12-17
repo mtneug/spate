@@ -16,7 +16,6 @@ package controller
 
 import (
 	"context"
-	"sync"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
@@ -52,40 +51,16 @@ func (c *Controller) run(ctx context.Context, stopChan <-chan struct{}) error {
 	log.Debug("Starting controller")
 	defer log.Debug("Controller stopped")
 
-	err := c.changeLoop.Start(ctx)
-	if err != nil {
-		return err
-	}
+	group := startstopper.NewGroup([]startstopper.StartStopper{
+		c.changeLoop,
+		c.eventLoop,
+	})
 
-	err = c.eventLoop.Start(ctx)
-	if err != nil {
-		_ = c.changeLoop.Stop(ctx)
-		return err
-	}
+	_ = group.Start(ctx)
 
 	<-stopChan
 
-	var err2 error
-	var wg sync.WaitGroup
-	wg.Add(2)
+	_ = group.Stop(ctx)
 
-	go func() {
-		err = c.changeLoop.Stop(ctx)
-		wg.Done()
-	}()
-	go func() {
-		err2 = c.eventLoop.Stop(ctx)
-		wg.Done()
-	}()
-
-	wg.Wait()
-
-	if err != nil {
-		return err
-	}
-	if err2 != nil {
-		return err2
-	}
-
-	return nil
+	return group.Err(ctx)
 }

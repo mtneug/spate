@@ -291,7 +291,7 @@
 			"importpath": "github.com/mtneug/pkg/startstopper",
 			"repository": "https://github.com/mtneug/pkg",
 			"vcs": "git",
-			"revision": "e3340263afa013552932b790049cad5a9f4ddc24",
+			"revision": "37b01ea547d1fe6740b2067b170acbedd03eb7a5",
 			"branch": "master",
 			"path": "/startstopper",
 			"notests": true

@@ -52,7 +52,7 @@ type Map interface {
 }
 
 type inMemoryMap struct {
-	sync.RWMutex
+	sync.Mutex
 	store map[string]StartStopper
 }
 
