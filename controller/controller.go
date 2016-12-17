@@ -61,6 +61,11 @@ func (c *Controller) run(ctx context.Context, stopChan <-chan struct{}) error {
 	<-stopChan
 
 	_ = group.Stop(ctx)
+	err := group.Err(ctx)
 
-	return group.Err(ctx)
+	c.autoscalers.ForEach(func(key string, autoscaler startstopper.StartStopper) {
+		_ = autoscaler.Stop(ctx)
+	})
+
+	return err
 }
