@@ -57,13 +57,12 @@ func (s *Server) Start() error {
 		return err
 	}
 
-	log.Info("Starting API server")
 	go func() {
 		s.err = s.server.Serve(ln)
 		close(s.doneChan)
-		log.Info("API server stopped")
+		log.Debug("API server stopped")
 	}()
-	log.Info("API server started")
+	log.Debug("API server started")
 
 	return nil
 }
