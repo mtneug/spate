@@ -16,6 +16,7 @@ package metric
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
@@ -26,6 +27,10 @@ import (
 // Observer observes one metric and aggregate measurements.
 type Observer struct {
 	startstopper.StartStopper
+
+	measures []float64
+	i        uint8
+	mutex    sync.RWMutex
 
 	Measurer          Measurer
 	Reducer           reducer.Reducer
@@ -48,6 +53,9 @@ func (o *Observer) run(ctx context.Context, stopChan <-chan struct{}) error {
 	log.Debug("Observer started")
 	defer log.Debug("Observer stopped")
 
+	o.measures = make([]float64, 0, o.AggregationAmount)
+
+	o.tick(ctx)
 	for {
 		select {
 		case <-time.After(o.Period):
@@ -60,6 +68,29 @@ func (o *Observer) run(ctx context.Context, stopChan <-chan struct{}) error {
 	}
 }
 
+// AggregatedMeasure of current measurements.
+func (o *Observer) AggregatedMeasure() (float64, error) {
+	o.mutex.RLock()
+	defer o.mutex.RUnlock()
+
+	return o.Reducer.Reduce(o.measures)
+}
+
 func (o *Observer) tick(ctx context.Context) {
-	// TODO: implement
+	o.mutex.Lock()
+	defer o.mutex.Unlock()
+
+	measure, err := o.Measurer.Measure()
+	if err != nil {
+		return
+	}
+
+	log.Debugf("Observer measured %f", measure)
+
+	if len(o.measures) < int(o.AggregationAmount) {
+		o.measures = append(o.measures, measure)
+	} else {
+		o.measures[o.i] = measure
+		o.i = (o.i + 1) % o.AggregationAmount
+	}
 }
