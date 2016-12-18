@@ -83,5 +83,14 @@ func constructAutoscaler(srv swarm.Service) (*autoscaler.Autoscaler, error) {
 		goals = append(goals, autoscaler.Goal{Observer: observer, Target: target})
 	}
 
-	return autoscaler.New(srv, goals)
+	a, err := autoscaler.New(srv, goals)
+	if err != nil {
+		return nil, err
+	}
+	err = labels.ParseAutoscaler(a, sl)
+	if err != nil {
+		return nil, err
+	}
+
+	return a, nil
 }
