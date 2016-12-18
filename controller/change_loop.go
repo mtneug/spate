@@ -104,6 +104,7 @@ func (cl *changeLoop) tick(ctx context.Context) {
 					Error("Failed to get autoscaler")
 				return
 			}
+			a.RLock()
 			if a.Service.Version.Index < srv.Version.Index {
 				// Update
 				cl.eventQueue <- types.Event{
@@ -112,6 +113,7 @@ func (cl *changeLoop) tick(ctx context.Context) {
 					Object: srv,
 				}
 			}
+			a.RUnlock()
 		}
 	}
 
@@ -125,11 +127,13 @@ func (cl *changeLoop) tick(ctx context.Context) {
 					Error("Failed to get autoscaler")
 				return
 			}
+			a.RLock()
 			cl.eventQueue <- types.Event{
 				ID:     ulid.New().String(),
 				Type:   types.EventTypeServiceDeleted,
 				Object: a.Service,
 			}
+			a.RUnlock()
 		}
 		delete(cl.seen, id)
 	})
