@@ -69,6 +69,10 @@ func constructAutoscaler(srv swarm.Service) (*autoscaler.Autoscaler, error) {
 		}
 
 		observer := metric.NewObserver(measurer, reducer)
+		err = labels.ParseObserver(observer, sl)
+		if err != nil {
+			return nil, err
+		}
 
 		target := types.Target{}
 		err = labels.ParseTarget(&target, metricLabels)
