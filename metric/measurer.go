@@ -51,7 +51,8 @@ type CPUMeasurer struct {
 
 // Measure the CPU utilization.
 func (m *CPUMeasurer) Measure() (float64, error) {
-	panic("not implemented")
+	// TODO: implement
+	return 0, errors.New("not implemented")
 }
 
 // MemoryMeasurer measures the memory utilization.
@@ -62,7 +63,8 @@ type MemoryMeasurer struct {
 
 // Measure the memory utilization.
 func (m *MemoryMeasurer) Measure() (float64, error) {
-	panic("not implemented")
+	// TODO: implement
+	return 0, errors.New("not implemented")
 }
 
 // PrometheusMeasurer measures the Prometheus metric.
@@ -73,5 +75,6 @@ type PrometheusMeasurer struct {
 
 // Measure the Prometheus metric.
 func (m *PrometheusMeasurer) Measure() (float64, error) {
-	panic("not implemented")
+	// TODO: implement
+	return 0, errors.New("not implemented")
 }
