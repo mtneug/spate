@@ -18,6 +18,7 @@ import (
 	"errors"
 
 	"github.com/docker/docker/api/types/swarm"
+	"github.com/mtneug/pkg/reducer"
 	"github.com/mtneug/spate/api/types"
 	"github.com/mtneug/spate/autoscaler"
 	"github.com/mtneug/spate/labels"
@@ -45,7 +46,7 @@ func constructAutoscaler(srv swarm.Service) (*autoscaler.Autoscaler, error) {
 
 	for metricName, metricLabels := range ml {
 		m := metric.New(metricName)
-		err := labels.ParseMetric(&m, metricLabels)
+		err = labels.ParseMetric(&m, metricLabels)
 		if err != nil {
 			return nil, err
 		}
@@ -58,12 +59,14 @@ func constructAutoscaler(srv swarm.Service) (*autoscaler.Autoscaler, error) {
 		}
 		haveSeenMetric[normMetric] = true
 
-		measurer, err := metric.NewMeasurer(srv.ID, m)
+		var measurer metric.Measurer
+		measurer, err = metric.NewMeasurer(srv.ID, m)
 		if err != nil {
 			return nil, err
 		}
 
-		reducer, err := labels.ParseReducer(metricLabels)
+		var reducer reducer.Reducer
+		reducer, err = labels.ParseReducer(metricLabels)
 		if err != nil {
 			return nil, err
 		}
