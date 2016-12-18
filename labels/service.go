@@ -29,13 +29,12 @@ func ExtractSpateLabels(labels map[string]string, metricLabels map[string]map[st
 				//   * "metric"
 				//   *  name
 				//   *  metric label
-				metricLabelParts := strings.SplitN(label, ".", 3)
-				if len(metricLabelParts) < 3 {
+				parts := strings.SplitN(label, ".", 3)
+				if len(parts) < 3 {
 					return ErrInvalidMetricLabel
 				}
 
-				metricName := metricLabelParts[1]
-				metricLabelSuffix := metricLabelParts[2]
+				metricName, metricLabelSuffix := parts[1], parts[2]
 				metricLabels[metricName] = initMapAndAdd(
 					metricLabels[metricName],
 					metricLabelSuffix,
