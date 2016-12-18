@@ -21,6 +21,7 @@ PKG_INTEGRATION=${PKG}/integration
 PKGS=$(shell go list ./... | grep -v /vendor/)
 
 GO_LDFLAGS=-ldflags " \
+	-s \
 	-X '$(PKG)/version.gitCommit=$(GIT_COMMIT)' \
 	-X '$(PKG)/version.gitTreeState=$(GIT_TREE_STATE)' \
 	-X '$(PKG)/version.buildDate=$(BUILD_DATE)'"
