@@ -17,6 +17,7 @@ package labels
 import (
 	"math"
 	"strconv"
+	"strings"
 
 	"github.com/mtneug/spate/api/types"
 )
@@ -73,9 +74,9 @@ func ParseTarget(target *types.Target, labels map[string]string) error {
 	// lower deviation
 	deviationLowerStr, ok := labels[MetricTargetDeviationLowerSuffix]
 	if ok {
-		deviationLower, err := strconv.ParseFloat(deviationLowerStr, 64)
-		if err != nil || math.IsNaN(deviationLower) || deviationLower < 0 {
-			return ErrInvalidDeviation
+		deviationLower, err := parseDeviation(value, deviationLowerStr)
+		if err != nil {
+			return err
 		}
 		target.LowerDeviation = deviationLower
 	}
@@ -83,12 +84,31 @@ func ParseTarget(target *types.Target, labels map[string]string) error {
 	// upper deviation
 	deviationUpperStr, ok := labels[MetricTargetDeviationUpperSuffix]
 	if ok {
-		deviationUpper, err := strconv.ParseFloat(deviationUpperStr, 64)
-		if err != nil || math.IsNaN(deviationUpper) || deviationUpper < 0 {
-			return ErrInvalidDeviation
+		deviationUpper, err := parseDeviation(value, deviationUpperStr)
+		if err != nil {
+			return err
 		}
 		target.UpperDeviation = deviationUpper
 	}
 
 	return nil
+}
+
+func parseDeviation(target float64, str string) (float64, error) {
+	var isPercentage bool
+	if strings.HasSuffix(str, "%") {
+		isPercentage = true
+		str = str[:len(str)-1]
+	}
+
+	f, err := strconv.ParseFloat(str, 64)
+	if err != nil || math.IsNaN(f) || f < 0 {
+		return 0, ErrInvalidDeviation
+	}
+
+	if isPercentage {
+		f = f / 100.0 * math.Abs(target)
+	}
+
+	return f, nil
 }

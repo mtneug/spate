@@ -83,6 +83,19 @@ func TestParseTarget(t *testing.T) {
 			},
 		},
 		{
+			labels: map[string]string{
+				"type": "cpu",
+				"target.deviation.lower": "1%",
+				"target.deviation.upper": "2%",
+			},
+			err: nil,
+			target: types.Target{
+				Value:          0.8,
+				LowerDeviation: 0.008,
+				UpperDeviation: 0.016,
+			},
+		},
+		{
 			labels: map[string]string{"type": "cpu", "target": "0.4"},
 			err:    nil,
 			target: types.Target{
@@ -111,6 +124,19 @@ func TestParseTarget(t *testing.T) {
 		},
 		{
 			labels: map[string]string{
+				"type": "memory",
+				"target.deviation.lower": "1%",
+				"target.deviation.upper": "2%",
+			},
+			err: nil,
+			target: types.Target{
+				Value:          0.8,
+				LowerDeviation: 0.008,
+				UpperDeviation: 0.016,
+			},
+		},
+		{
+			labels: map[string]string{
 				"target":                 "42",
 				"target.deviation.lower": "1",
 				"target.deviation.upper": "2",
@@ -133,6 +159,32 @@ func TestParseTarget(t *testing.T) {
 				Value:          -42.1234,
 				LowerDeviation: 1.42,
 				UpperDeviation: 2.42,
+			},
+		},
+		{
+			labels: map[string]string{
+				"target":                 "42",
+				"target.deviation.lower": "50%",
+				"target.deviation.upper": "25%",
+			},
+			err: nil,
+			target: types.Target{
+				Value:          42,
+				LowerDeviation: 21,
+				UpperDeviation: 10.5,
+			},
+		},
+		{
+			labels: map[string]string{
+				"target":                 "-42.1234",
+				"target.deviation.lower": "50%",
+				"target.deviation.upper": "25%",
+			},
+			err: nil,
+			target: types.Target{
+				Value:          -42.1234,
+				LowerDeviation: 21.0617,
+				UpperDeviation: 10.53085,
 			},
 		},
 	}
