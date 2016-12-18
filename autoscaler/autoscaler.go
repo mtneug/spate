@@ -44,11 +44,11 @@ type Autoscaler struct {
 	Update  bool
 	Goals   []Goal
 
-	Period                 time.Duration
-	CooldownScaledUp       time.Duration
-	CooldownScaledDown     time.Duration
-	CooldownServiceAdded   time.Duration
-	CooldownServiceUpdated time.Duration
+	Period                    time.Duration
+	CooldownServiceCreated    time.Duration
+	CooldownServiceUpdated    time.Duration
+	CooldownServiceScaledUp   time.Duration
+	CooldownServiceScaledDown time.Duration
 
 	MaxReplicas uint64
 	MinReplicas uint64
@@ -86,6 +86,10 @@ func (a *Autoscaler) run(ctx context.Context, stopChan <-chan struct{}) error {
 		return err
 	}
 
+	if a.Update {
+		a.cooldown(ctx, types.EventTypeServiceUpdated)
+	}
+
 loop:
 	for {
 		select {
@@ -104,6 +108,30 @@ loop:
 	}
 
 	return err
+}
+
+func (a *Autoscaler) cooldown(ctx context.Context, et types.EventType) {
+	// TODO: refactor to use map
+	var d time.Duration
+	switch et {
+	case types.EventTypeServiceCreated:
+		d = a.CooldownServiceCreated
+	case types.EventTypeServiceUpdated:
+		d = a.CooldownServiceUpdated
+	case types.EventTypeServiceScaledUp:
+		d = a.CooldownServiceScaledUp
+	case types.EventTypeServiceScaledDown:
+		d = a.CooldownServiceScaledDown
+	}
+
+	if d > 0 {
+		log.Debug("Autoscaler cooldown after '" + et + "' started")
+		select {
+		case <-time.After(d):
+		case <-ctx.Done():
+		}
+		log.Debug("Autoscaler cooldown after '" + et + "' stopped")
+	}
 }
 
 func (a *Autoscaler) tick(ctx context.Context) {

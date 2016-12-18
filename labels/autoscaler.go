@@ -57,37 +57,37 @@ func ParseAutoscaler(a *autoscaler.Autoscaler, labels map[string]string) error {
 	// cooldown ScaledUp
 	autoscalerCooldownScaledUpStr, ok := labels[AutoscalerCooldownScaledUp]
 	if !ok {
-		a.CooldownScaledUp = DefaultCooldownScaledUp
+		a.CooldownServiceScaledUp = DefaultCooldownScaledUp
 	} else {
 		autoscalerCooldownScaledUp, err := time.ParseDuration(autoscalerCooldownScaledUpStr)
 		if err != nil {
 			return ErrInvalidDuration
 		}
-		a.CooldownScaledUp = autoscalerCooldownScaledUp
+		a.CooldownServiceScaledUp = autoscalerCooldownScaledUp
 	}
 
 	// cooldown ScaledDown
 	autoscalerCooldownScaledDownStr, ok := labels[AutoscalerCooldownScaledDown]
 	if !ok {
-		a.CooldownScaledDown = DefaultCooldownScaledDown
+		a.CooldownServiceScaledDown = DefaultCooldownScaledDown
 	} else {
 		autoscalerCooldownScaledDown, err := time.ParseDuration(autoscalerCooldownScaledDownStr)
 		if err != nil {
 			return ErrInvalidDuration
 		}
-		a.CooldownScaledDown = autoscalerCooldownScaledDown
+		a.CooldownServiceScaledDown = autoscalerCooldownScaledDown
 	}
 
 	// cooldown ServiceAdded
 	autoscalerCooldownServiceAddedStr, ok := labels[AutoscalerCooldownServiceAdded]
 	if !ok {
-		a.CooldownServiceAdded = DefaultCooldownServiceAdded
+		a.CooldownServiceCreated = DefaultCooldownServiceAdded
 	} else {
 		autoscalerCooldownServiceAdded, err := time.ParseDuration(autoscalerCooldownServiceAddedStr)
 		if err != nil {
 			return ErrInvalidDuration
 		}
-		a.CooldownServiceAdded = autoscalerCooldownServiceAdded
+		a.CooldownServiceCreated = autoscalerCooldownServiceAdded
 	}
 
 	// cooldown ServiceUpdated
