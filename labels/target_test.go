@@ -72,18 +72,9 @@ func TestParseTarget(t *testing.T) {
 			err: labels.ErrInvalidDeviation,
 		},
 
-		// value
+		// ok
 		{
 			labels: map[string]string{"type": "cpu"},
-			err:    nil,
-			target: types.Target{
-				Value:          0.7,
-				LowerDeviation: 0,
-				UpperDeviation: 0,
-			},
-		},
-		{
-			labels: map[string]string{"type": "cpu", "target": "0.8"},
 			err:    nil,
 			target: types.Target{
 				Value:          0.8,
@@ -92,10 +83,28 @@ func TestParseTarget(t *testing.T) {
 			},
 		},
 		{
+			labels: map[string]string{"type": "cpu", "target": "0.4"},
+			err:    nil,
+			target: types.Target{
+				Value:          0.4,
+				LowerDeviation: 0,
+				UpperDeviation: 0,
+			},
+		},
+		{
 			labels: map[string]string{"type": "memory"},
 			err:    nil,
 			target: types.Target{
-				Value:          0.7,
+				Value:          0.8,
+				LowerDeviation: 0,
+				UpperDeviation: 0,
+			},
+		},
+		{
+			labels: map[string]string{"type": "memory", "target": "0.4"},
+			err:    nil,
+			target: types.Target{
+				Value:          0.4,
 				LowerDeviation: 0,
 				UpperDeviation: 0,
 			},

@@ -23,10 +23,10 @@ import (
 
 var (
 	// DefaultTargetValueCPU if no value given.
-	DefaultTargetValueCPU = 0.7
+	DefaultTargetValueCPU = 0.8
 
 	// DefaultTargetValueMemory if no value given.
-	DefaultTargetValueMemory = 0.7
+	DefaultTargetValueMemory = 0.8
 
 	// TODO: Default lower/upper deviation for CPU/memory
 )
