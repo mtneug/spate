@@ -104,7 +104,9 @@ func ParseAutoscaler(a *autoscaler.Autoscaler, labels map[string]string) error {
 
 	// min replicas
 	replicasMinStr, ok := labels[ReplicasMin]
-	if ok {
+	if !ok {
+		a.MinReplicas = 1
+	} else {
 		replicasMin, err := strconv.ParseUint(replicasMinStr, 10, 64)
 		if err != nil {
 			return ErrInvalidUint

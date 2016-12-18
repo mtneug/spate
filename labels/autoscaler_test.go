@@ -69,7 +69,7 @@ func TestParseAutoscaler(t *testing.T) {
 				CooldownScaledDown:     5 * time.Minute,
 				CooldownServiceAdded:   0 * time.Second,
 				CooldownServiceUpdated: 0 * time.Second,
-				MinReplicas:            0,
+				MinReplicas:            1,
 				MaxReplicas:            math.MaxUint64,
 			},
 		},
