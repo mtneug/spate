@@ -82,10 +82,11 @@ func (o *Observer) tick(ctx context.Context) {
 
 	measure, err := o.Measurer.Measure()
 	if err != nil {
+		log.Warn("Measuring failed")
 		return
 	}
 
-	log.Debugf("Observer measured %f", measure)
+	log.Debugf("Measured %f", measure)
 
 	if len(o.measures) < int(o.AggregationAmount) {
 		o.measures = append(o.measures, measure)
