@@ -18,6 +18,7 @@ import (
 	"context"
 	"time"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/mtneug/pkg/reducer"
 	"github.com/mtneug/pkg/startstopper"
 )
@@ -44,5 +45,21 @@ func NewObserver(m Measurer, r reducer.Reducer) *Observer {
 }
 
 func (o *Observer) run(ctx context.Context, stopChan <-chan struct{}) error {
-	panic("not implemented")
+	log.Debug("Observer started")
+	defer log.Debug("Observer stopped")
+
+	for {
+		select {
+		case <-time.After(o.Period):
+			o.tick(ctx)
+		case <-stopChan:
+			return nil
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+	}
+}
+
+func (o *Observer) tick(ctx context.Context) {
+	// TODO: implement
 }

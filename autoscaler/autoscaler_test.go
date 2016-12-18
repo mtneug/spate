@@ -26,9 +26,14 @@ import (
 
 func TestNew(t *testing.T) {
 	srv := swarm.Service{}
-	goals := make([]autoscaler.Goal, 0)
 
-	a := autoscaler.New(srv, goals)
+	goals := make([]autoscaler.Goal, 0)
+	_, err := autoscaler.New(srv, goals)
+	require.EqualError(t, err, autoscaler.ErrNoGoals.Error())
+
+	goals = make([]autoscaler.Goal, 1)
+	a, err := autoscaler.New(srv, goals)
+	require.NoError(t, err)
 	require.Equal(t, srv, a.Service)
 	require.Equal(t, goals, a.Goals)
 }

@@ -16,13 +16,18 @@ package autoscaler
 
 import (
 	"context"
+	"errors"
 	"time"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/mtneug/pkg/startstopper"
 	"github.com/mtneug/spate/api/types"
 	"github.com/mtneug/spate/metric"
 )
+
+// ErrNoGoals indicates that no goals were specified.
+var ErrNoGoals = errors.New("autoscaler: no goals")
 
 // Goal consist of an observer and a target.
 type Goal struct {
@@ -50,16 +55,57 @@ type Autoscaler struct {
 }
 
 // New creates an autoscaler for the given service.
-func New(srv swarm.Service, goal []Goal) *Autoscaler {
+func New(srv swarm.Service, goals []Goal) (*Autoscaler, error) {
+	if len(goals) == 0 {
+		return nil, ErrNoGoals
+	}
+
 	a := &Autoscaler{
 		Service: srv,
-		Goals:   goal,
+		Goals:   goals,
 	}
 	a.StartStopper = startstopper.NewGo(startstopper.RunnerFunc(a.run))
-	return a
+	return a, nil
 }
 
 func (a *Autoscaler) run(ctx context.Context, stopChan <-chan struct{}) error {
+	log.Debug("Autoscaler started")
+	defer log.Debug("Autoscaler stopped")
+
+	var err error
+
+	// TODO: Change data structues so that this allocation is unnecessary
+	observer := make([]startstopper.StartStopper, len(a.Goals))
+	for i, goal := range a.Goals {
+		observer[i] = goal.Observer
+	}
+	observerGroup := startstopper.NewGroup(observer)
+
+	err = observerGroup.Start(ctx)
+	if err != nil {
+		return err
+	}
+
+loop:
+	for {
+		select {
+		case <-time.After(a.Period):
+			a.tick(ctx)
+		case <-stopChan:
+			break loop
+		case <-ctx.Done():
+			break loop
+		}
+	}
+
+	err = observerGroup.Stop(ctx)
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
+func (a *Autoscaler) tick(ctx context.Context) {
 	// TODO: implement
-	return nil
 }
