@@ -56,6 +56,18 @@ install:
 	@echo "🌊 $@"
 	@go install $(GO_BUILD_ARGS) $(PKG)
 
+run: build
+	@echo "🌊 $@"
+	@bin/spate \
+		--log-level debug \
+		--controller-period 1s \
+		--default-autoscaler-period 5s \
+		--default-observer-period 5s \
+		--default-cooldown-scaled_down 2s \
+		--default-cooldown-scaled_up 2s \
+		--default-cooldown-service_added 2s \
+		--default-cooldown-service_updated 2s
+
 clean:
 	@echo "🌊 $@"
 	@rm -f bin
