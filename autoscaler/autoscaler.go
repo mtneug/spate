@@ -151,17 +151,19 @@ func (a *Autoscaler) tick(ctx context.Context, stopChan <-chan struct{}) {
 		err  error
 		ag   float64
 		once sync.Once
+		srv  swarm.Service
 	)
 
 	a.Lock()
 	unlock := func() { once.Do(func() { a.Unlock() }) }
 	defer unlock()
 
-	a.Service, _, err = docker.C.ServiceInspectWithRaw(ctx, a.Service.ID)
+	srv, _, err = docker.C.ServiceInspectWithRaw(ctx, a.Service.ID)
 	if err != nil {
 		log.WithError(err).Warn("Service inspection failed")
 		return
 	}
+	a.Service = srv
 
 	srvMode := a.Service.Spec.Mode
 	if srvMode.Replicated == nil || srvMode.Replicated.Replicas == nil {
@@ -206,9 +208,11 @@ func (a *Autoscaler) tick(ctx context.Context, stopChan <-chan struct{}) {
 		return
 	}
 
-	a.Service, _, err = docker.C.ServiceInspectWithRaw(ctx, a.Service.ID)
+	srv, _, err = docker.C.ServiceInspectWithRaw(ctx, a.Service.ID)
 	if err != nil {
 		log.WithError(err).Warn("Service inspection failed")
+	} else {
+		a.Service = srv
 	}
 
 	// Autoscaler should not be locked during cooldown times
