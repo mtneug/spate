@@ -159,7 +159,7 @@ func (a *Autoscaler) tick(ctx context.Context, stopChan <-chan struct{}) {
 
 	a.Service, _, err = docker.C.ServiceInspectWithRaw(ctx, a.Service.ID)
 	if err != nil {
-		log.Warn("Service inspection failed")
+		log.WithError(err).Warn("Service inspection failed")
 		return
 	}
 
@@ -176,7 +176,7 @@ func (a *Autoscaler) tick(ctx context.Context, stopChan <-chan struct{}) {
 	for _, goal := range a.Goals {
 		ag, err = goal.Observer.AggregatedMeasure()
 		if err != nil {
-			log.Warn("Measure aggregation failed")
+			log.WithError(err).Warn("Measure aggregation failed")
 			return
 		}
 
@@ -202,13 +202,13 @@ func (a *Autoscaler) tick(ctx context.Context, stopChan <-chan struct{}) {
 
 	err = docker.C.ServiceUpdate(ctx, a.Service.ID, a.Service.Version, a.Service.Spec, dockerTypes.ServiceUpdateOptions{})
 	if err != nil {
-		log.Warn("Service scaling failed")
+		log.WithError(err).Warn("Service scaling failed")
 		return
 	}
 
 	a.Service, _, err = docker.C.ServiceInspectWithRaw(ctx, a.Service.ID)
 	if err != nil {
-		log.Warn("Service inspection failed")
+		log.WithError(err).Warn("Service inspection failed")
 	}
 
 	// Autoscaler should not be locked during cooldown times

@@ -82,7 +82,7 @@ func (o *Observer) tick(ctx context.Context) {
 
 	measure, err := o.Measurer.Measure()
 	if err != nil {
-		log.Warn("Measuring failed")
+		log.WithError(err).Warn("Measuring failed")
 		return
 	}
 
