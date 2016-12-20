@@ -75,16 +75,22 @@ func (el *eventLoop) handleEvent(ctx context.Context, e types.Event) {
 		changed, err = el.addAutoscaler(ctx, srv)
 		if err != nil {
 			log.WithError(err).Error("Could not add autoscaler")
+		} else {
+			log.Info("Autoscaler added")
 		}
 	case types.EventTypeServiceUpdated:
 		changed, err = el.updateAutoscaler(ctx, srv)
 		if err != nil {
 			log.WithError(err).Error("Could not update autoscaler")
+		} else {
+			log.Info("Autoscaler updated")
 		}
 	case types.EventTypeServiceDeleted:
 		changed, err = el.deleteAutoscaler(ctx, srv)
 		if err != nil {
 			log.WithError(err).Error("Could not delete autoscaler")
+		} else {
+			log.Info("Autoscaler deleted")
 		}
 	}
 

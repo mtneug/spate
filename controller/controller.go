@@ -48,8 +48,8 @@ func New(p time.Duration, m startstopper.Map) (*Controller, error) {
 }
 
 func (c *Controller) run(ctx context.Context, stopChan <-chan struct{}) error {
-	log.Debug("Controller started")
-	defer log.Debug("Controller stopped")
+	log.Debug("Controller loop started")
+	defer log.Debug("Controller loop stopped")
 
 	group := startstopper.NewGroup([]startstopper.StartStopper{
 		c.changeLoop,

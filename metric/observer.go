@@ -50,8 +50,8 @@ func NewObserver(m Measurer, r reducer.Reducer) *Observer {
 }
 
 func (o *Observer) run(ctx context.Context, stopChan <-chan struct{}) error {
-	log.Debug("Observer started")
-	defer log.Debug("Observer stopped")
+	log.Debug("Observer loop started")
+	defer log.Debug("Observer loop stopped")
 
 	o.measures = make([]float64, 0, o.AggregationAmount)
 

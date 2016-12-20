@@ -74,8 +74,8 @@ func New(srv swarm.Service, goals []Goal) (*Autoscaler, error) {
 }
 
 func (a *Autoscaler) run(ctx context.Context, stopChan <-chan struct{}) error {
-	log.Debug("Autoscaler started")
-	defer log.Debug("Autoscaler stopped")
+	log.Debug("Autoscaler loop started")
+	defer log.Debug("Autoscaler loop stopped")
 
 	var err error
 
