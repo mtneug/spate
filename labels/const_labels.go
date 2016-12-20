@@ -58,12 +58,6 @@ const (
 	// Metric
 	//
 
-	// AutoscalerReplicasMin is the suffix (after spate namespace) for metrics.
-	AutoscalerReplicasMin = "autoscaler.replicas.min"
-
-	// AutoscalerReplicasMax is the suffix (after spate namespace) for metrics.
-	AutoscalerReplicasMax = "autoscaler.replicas.max"
-
 	// MetricSuffix is the suffix (after spate namespace) for metrics.
 	MetricSuffix = "metric"
 
