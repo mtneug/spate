@@ -15,6 +15,7 @@
 package metric_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/mtneug/spate/metric"
@@ -26,7 +27,7 @@ type MockMeasure struct {
 	mock.Mock
 }
 
-func (m *MockMeasure) Measure() (float64, error) {
+func (m *MockMeasure) Measure(ctx context.Context) (float64, error) {
 	args := m.Called()
 	return args.Get(0).(float64), args.Error(1)
 }

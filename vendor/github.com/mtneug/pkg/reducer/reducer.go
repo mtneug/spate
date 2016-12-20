@@ -73,10 +73,18 @@ func Min() Reducer {
 // Avg returns an reducer that reduces the float64 slice to the average.
 func Avg() Reducer {
 	return Func(func(data []float64) (float64, error) {
+		sum, _ := Sum().Reduce(data)
+		return sum / float64(len(data)), nil
+	})
+}
+
+// Sum returns an reducer that reduces the float64 slice to the sum.
+func Sum() Reducer {
+	return Func(func(data []float64) (float64, error) {
 		sum := data[0]
 		for i := 1; i < len(data); i++ {
 			sum += data[i]
 		}
-		return sum / float64(len(data)), nil
+		return sum, nil
 	})
 }

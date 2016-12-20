@@ -80,7 +80,7 @@ func (o *Observer) tick(ctx context.Context) {
 	o.mutex.Lock()
 	defer o.mutex.Unlock()
 
-	measure, err := o.Measurer.Measure()
+	measure, err := o.Measurer.Measure(ctx)
 	if err != nil {
 		log.WithError(err).Warn("Measuring failed")
 		return

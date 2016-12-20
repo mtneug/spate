@@ -282,7 +282,7 @@
 			"importpath": "github.com/mtneug/pkg/reducer",
 			"repository": "https://github.com/mtneug/pkg",
 			"vcs": "git",
-			"revision": "9734d2353fc2a7e2203bdca943fc4a6f7748e883",
+			"revision": "358503e7219db3bd60b922bb6f70e9fe4b64df63",
 			"branch": "master",
 			"path": "/reducer",
 			"notests": true
@@ -385,7 +385,7 @@
 			"importpath": "github.com/prometheus/common/expfmt",
 			"repository": "https://github.com/prometheus/common",
 			"vcs": "git",
-			"revision": "85637ea67b04b5c3bb25e671dacded2977f8f9f6",
+			"revision": "195bde7883f7c39ea62b0d92ab7359b5327065cb",
 			"branch": "master",
 			"path": "expfmt",
 			"notests": true
