@@ -25,6 +25,7 @@ import (
 
 func TestChangeLoopRun(t *testing.T) {
 	t.Parallel()
+	t.Skip("Refactor so that the Docker Client can be mocked")
 
 	eq := make(chan types.Event)
 	cl := newChangeLoop(time.Second, eq, nil)

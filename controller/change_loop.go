@@ -66,6 +66,7 @@ func (cl *changeLoop) run(ctx context.Context, stopChan <-chan struct{}) error {
 	log.Debug("Change detection loop started")
 	defer log.Debug("Change detection loop stopped")
 
+	cl.tick(ctx)
 	for {
 		select {
 		case <-time.After(cl.period):
