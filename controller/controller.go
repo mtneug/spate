@@ -58,7 +58,10 @@ func (c *Controller) run(ctx context.Context, stopChan <-chan struct{}) error {
 
 	_ = group.Start(ctx)
 
-	<-stopChan
+	select {
+	case <-stopChan:
+	case <-ctx.Done():
+	}
 
 	_ = group.Stop(ctx)
 	err := group.Err(ctx)
