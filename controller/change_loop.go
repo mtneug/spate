@@ -43,9 +43,9 @@ func init() {
 type changeLoop struct {
 	startstopper.StartStopper
 
-	period      time.Duration
-	eventQueue  chan<- types.Event
-	autoscalers startstopper.Map
+	period         time.Duration
+	eventQueue     chan<- types.Event
+	autoscalersMap startstopper.Map
 
 	// stored so that it doesn't need to be reallocated
 	seen map[string]bool
@@ -53,10 +53,10 @@ type changeLoop struct {
 
 func newChangeLoop(p time.Duration, eq chan<- types.Event, m startstopper.Map) *changeLoop {
 	cl := &changeLoop{
-		period:      p,
-		eventQueue:  eq,
-		autoscalers: m,
-		seen:        make(map[string]bool),
+		period:         p,
+		eventQueue:     eq,
+		autoscalersMap: m,
+		seen:           make(map[string]bool),
 	}
 	cl.StartStopper = startstopper.NewGo(startstopper.RunnerFunc(cl.run))
 	return cl
@@ -88,7 +88,7 @@ func (cl *changeLoop) tick(ctx context.Context) {
 	for _, srv := range services {
 		cl.seen[srv.ID] = true
 
-		ss, present := cl.autoscalers.Get(srv.ID)
+		ss, present := cl.autoscalersMap.Get(srv.ID)
 		if !present {
 			// Add
 			cl.eventQueue <- types.Event{
@@ -117,7 +117,7 @@ func (cl *changeLoop) tick(ctx context.Context) {
 		}
 	}
 
-	cl.autoscalers.ForEach(func(id string, ss startstopper.StartStopper) {
+	cl.autoscalersMap.ForEach(func(id string, ss startstopper.StartStopper) {
 		if !cl.seen[id] {
 			// Delete
 			a, ok := ss.(*autoscaler.Autoscaler)
