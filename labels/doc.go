@@ -12,6 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package labels contains code for parsing spate service labels an constructing
-// objects out of them.
+// Package labels contains code for parsing spate service labels and
+// constructing objects out of them.
 package labels
