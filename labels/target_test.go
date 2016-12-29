@@ -192,7 +192,7 @@ func TestParseTarget(t *testing.T) {
 	for _, c := range testCases {
 		target := types.Target{}
 		err := labels.ParseTarget(&target, c.labels)
-		t.Logf("%v", target)
+
 		require.Equal(t, c.err, err)
 		if c.err == nil {
 			require.Equal(t, c.target, target)
