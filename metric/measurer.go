@@ -27,7 +27,6 @@ import (
 	"github.com/docker/docker/api/types/filters"
 	"github.com/mtneug/pkg/reducer"
 	"github.com/mtneug/spate/docker"
-	"github.com/mtneug/spate/model"
 	"github.com/prometheus/common/expfmt"
 	prometheusModel "github.com/prometheus/common/model"
 )
@@ -53,13 +52,13 @@ type Measurer interface {
 }
 
 // NewMeasurer creates the right measurer for given metric.
-func NewMeasurer(serviceID, serviceName string, metric model.Metric) (measurer Measurer, err error) {
+func NewMeasurer(serviceID, serviceName string, metric Metric) (measurer Measurer, err error) {
 	switch metric.Type {
-	case model.MetricTypeCPU:
+	case TypeCPU:
 		measurer = &CPUMeasurer{ServiceID: serviceID, ServiceName: serviceName, Metric: metric}
-	case model.MetricTypeMemory:
+	case TypeMemory:
 		measurer = &MemoryMeasurer{ServiceID: serviceID, ServiceName: serviceName, Metric: metric}
-	case model.MetricTypePrometheus:
+	case TypePrometheus:
 		measurer = &PrometheusMeasurer{ServiceID: serviceID, ServiceName: serviceName, Metric: metric}
 	default:
 		err = ErrUnknownType
@@ -71,7 +70,7 @@ func NewMeasurer(serviceID, serviceName string, metric model.Metric) (measurer M
 type CPUMeasurer struct {
 	ServiceID   string
 	ServiceName string
-	Metric      model.Metric
+	Metric      Metric
 }
 
 // Measure the CPU utilization.
@@ -84,7 +83,7 @@ func (m *CPUMeasurer) Measure(ctx context.Context) (float64, error) {
 type MemoryMeasurer struct {
 	ServiceID   string
 	ServiceName string
-	Metric      model.Metric
+	Metric      Metric
 }
 
 // Measure the memory utilization.
@@ -97,7 +96,7 @@ func (m *MemoryMeasurer) Measure(ctx context.Context) (float64, error) {
 type PrometheusMeasurer struct {
 	ServiceID   string
 	ServiceName string
-	Metric      model.Metric
+	Metric      Metric
 	client      http.Client
 }
 
@@ -107,10 +106,10 @@ func (m *PrometheusMeasurer) Measure(ctx context.Context) (float64, error) {
 	var expectedNMeasurements int
 
 	switch m.Metric.Kind {
-	case model.MetricKindSystem:
+	case KindSystem:
 		expectedNMeasurements = 1
 
-	case model.MetricKindReplica:
+	case KindReplica:
 		args := filters.NewArgs()
 		args.Add("service", m.ServiceID)
 		args.Add("desired-state", "running")

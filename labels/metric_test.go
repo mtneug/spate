@@ -19,7 +19,7 @@ import (
 	"testing"
 
 	"github.com/mtneug/spate/labels"
-	"github.com/mtneug/spate/model"
+	"github.com/mtneug/spate/metric"
 	"github.com/stretchr/testify/require"
 )
 
@@ -32,7 +32,7 @@ func TestParseMetric(t *testing.T) {
 	testCases := []struct {
 		labels map[string]string
 		err    error
-		metric model.Metric
+		metric metric.Metric
 	}{
 		// errors
 		{
@@ -102,9 +102,9 @@ func TestParseMetric(t *testing.T) {
 				"type": "cpu",
 			},
 			err: nil,
-			metric: model.Metric{
-				Type: model.MetricTypeCPU,
-				Kind: model.MetricKindReplica,
+			metric: metric.Metric{
+				Type: metric.TypeCPU,
+				Kind: metric.KindReplica,
 			},
 		},
 		{
@@ -113,9 +113,9 @@ func TestParseMetric(t *testing.T) {
 				"kind": "replica",
 			},
 			err: nil,
-			metric: model.Metric{
-				Type: model.MetricTypeCPU,
-				Kind: model.MetricKindReplica,
+			metric: metric.Metric{
+				Type: metric.TypeCPU,
+				Kind: metric.KindReplica,
 			},
 		},
 
@@ -125,9 +125,9 @@ func TestParseMetric(t *testing.T) {
 				"type": "memory",
 			},
 			err: nil,
-			metric: model.Metric{
-				Type: model.MetricTypeMemory,
-				Kind: model.MetricKindReplica,
+			metric: metric.Metric{
+				Type: metric.TypeMemory,
+				Kind: metric.KindReplica,
 			},
 		},
 		{
@@ -136,9 +136,9 @@ func TestParseMetric(t *testing.T) {
 				"kind": "replica",
 			},
 			err: nil,
-			metric: model.Metric{
-				Type: model.MetricTypeMemory,
-				Kind: model.MetricKindReplica,
+			metric: metric.Metric{
+				Type: metric.TypeMemory,
+				Kind: metric.KindReplica,
 			},
 		},
 
@@ -151,10 +151,10 @@ func TestParseMetric(t *testing.T) {
 				"prometheus.name":     "test_metric",
 			},
 			err: nil,
-			metric: model.Metric{
-				Type: model.MetricTypePrometheus,
-				Kind: model.MetricKindReplica,
-				Prometheus: model.PrometheusSpec{
+			metric: metric.Metric{
+				Type: metric.TypePrometheus,
+				Kind: metric.KindReplica,
+				Prometheus: metric.PrometheusSpec{
 					Endpoint: *testUrl,
 					Name:     "test_metric",
 				},
@@ -168,10 +168,10 @@ func TestParseMetric(t *testing.T) {
 				"prometheus.name":     "test_metric",
 			},
 			err: nil,
-			metric: model.Metric{
-				Type: model.MetricTypePrometheus,
-				Kind: model.MetricKindSystem,
-				Prometheus: model.PrometheusSpec{
+			metric: metric.Metric{
+				Type: metric.TypePrometheus,
+				Kind: metric.KindSystem,
+				Prometheus: metric.PrometheusSpec{
 					Endpoint: *testUrl,
 					Name:     "test_metric",
 				},
@@ -180,11 +180,11 @@ func TestParseMetric(t *testing.T) {
 	}
 
 	for _, c := range testCases {
-		metric := model.Metric{}
-		err := labels.ParseMetric(&metric, c.labels)
+		m := metric.Metric{}
+		err := labels.ParseMetric(&m, c.labels)
 		require.Equal(t, c.err, err)
 		if c.err == nil {
-			require.Equal(t, c.metric, metric)
+			require.Equal(t, c.metric, m)
 		}
 	}
 }

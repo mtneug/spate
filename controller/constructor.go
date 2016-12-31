@@ -22,7 +22,6 @@ import (
 	"github.com/mtneug/spate/autoscaler"
 	"github.com/mtneug/spate/labels"
 	"github.com/mtneug/spate/metric"
-	"github.com/mtneug/spate/model"
 )
 
 var (
@@ -41,7 +40,7 @@ func constructAutoscaler(srv swarm.Service) (*autoscaler.Autoscaler, error) {
 	}
 
 	// construct objects
-	haveSeenMetric := make(map[model.Metric]bool, len(ml))
+	haveSeenMetric := make(map[metric.Metric]bool, len(ml))
 	goals := make([]autoscaler.Goal, 0, len(ml))
 
 	for metricName, metricLabels := range ml {

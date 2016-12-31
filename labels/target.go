@@ -20,7 +20,6 @@ import (
 	"strings"
 
 	"github.com/mtneug/spate/metric"
-	"github.com/mtneug/spate/model"
 )
 
 var (
@@ -53,11 +52,11 @@ func ParseTarget(target *metric.Target, labels map[string]string) error {
 			return ErrNoValue
 		}
 
-		switch model.MetricType(metricTypeStr) {
-		case model.MetricTypeCPU:
+		switch metric.Type(metricTypeStr) {
+		case metric.TypeCPU:
 			value = DefaultTargetValueCPU
 			valueParsed = true
-		case model.MetricTypeMemory:
+		case metric.TypeMemory:
 			value = DefaultTargetValueMemory
 			valueParsed = true
 		default:

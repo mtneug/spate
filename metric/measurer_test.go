@@ -18,7 +18,6 @@ import (
 	"testing"
 
 	"github.com/mtneug/spate/metric"
-	"github.com/mtneug/spate/model"
 	"github.com/stretchr/testify/require"
 )
 
@@ -28,22 +27,22 @@ func TestNewMeasurer(t *testing.T) {
 	serviceID := "bv24k4vkkdnch70zpt81ia4kz"
 	serviceName := "test_service_name"
 
-	m := model.Metric{}
+	m := metric.Metric{}
 	measurer, err := metric.NewMeasurer(serviceID, serviceName, m)
 	require.EqualError(t, metric.ErrUnknownType, err.Error())
 	require.Nil(t, measurer)
 
-	m = model.Metric{Type: model.MetricTypeCPU}
+	m = metric.Metric{Type: metric.TypeCPU}
 	measurer, err = metric.NewMeasurer(serviceID, serviceName, m)
 	require.NoError(t, err)
 	require.IsType(t, &metric.CPUMeasurer{}, measurer)
 
-	m = model.Metric{Type: model.MetricTypeMemory}
+	m = metric.Metric{Type: metric.TypeMemory}
 	measurer, err = metric.NewMeasurer(serviceID, serviceName, m)
 	require.NoError(t, err)
 	require.IsType(t, &metric.MemoryMeasurer{}, measurer)
 
-	m = model.Metric{Type: model.MetricTypePrometheus}
+	m = metric.Metric{Type: metric.TypePrometheus}
 	measurer, err = metric.NewMeasurer(serviceID, serviceName, m)
 	require.NoError(t, err)
 	require.IsType(t, &metric.PrometheusMeasurer{}, measurer)
