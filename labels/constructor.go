@@ -12,29 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package controller
+package labels
 
 import (
-	"errors"
-
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/mtneug/pkg/reducer"
 	"github.com/mtneug/spate/autoscaler"
-	"github.com/mtneug/spate/labels"
 	"github.com/mtneug/spate/metric"
 )
 
-var (
-	// ErrDuplicateMetric indicates that at least two metrics are the same.
-	ErrDuplicateMetric = errors.New("controller: duplicate metric")
-)
-
-func constructAutoscaler(srv swarm.Service) (*autoscaler.Autoscaler, error) {
+// ConstructAutoscaler creates a new autoscaler based on a swarm service.
+func ConstructAutoscaler(srv swarm.Service) (*autoscaler.Autoscaler, error) {
 	// extract labels
 	sl := make(map[string]string, len(srv.Spec.Labels))
 	ml := make(map[string]map[string]string)
 
-	err := labels.ExtractSpateLabels(sl, ml, srv.Spec.Labels)
+	err := ExtractSpateLabels(sl, ml, srv.Spec.Labels)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +38,7 @@ func constructAutoscaler(srv swarm.Service) (*autoscaler.Autoscaler, error) {
 
 	for metricName, metricLabels := range ml {
 		m := metric.New(metricName)
-		err = labels.ParseMetric(&m, metricLabels)
+		err = ParseMetric(&m, metricLabels)
 		if err != nil {
 			return nil, err
 		}
@@ -65,19 +58,19 @@ func constructAutoscaler(srv swarm.Service) (*autoscaler.Autoscaler, error) {
 		}
 
 		var reducer reducer.Reducer
-		reducer, err = labels.ParseReducer(metricLabels)
+		reducer, err = ParseReducer(metricLabels)
 		if err != nil {
 			return nil, err
 		}
 
 		observer := metric.NewObserver(measurer, reducer)
-		err = labels.ParseObserver(observer, metricLabels)
+		err = ParseObserver(observer, metricLabels)
 		if err != nil {
 			return nil, err
 		}
 
 		target := metric.Target{}
-		err = labels.ParseTarget(&target, metricLabels)
+		err = ParseTarget(&target, metricLabels)
 		if err != nil {
 			return nil, err
 		}
@@ -89,7 +82,7 @@ func constructAutoscaler(srv swarm.Service) (*autoscaler.Autoscaler, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = labels.ParseAutoscaler(a, sl)
+	err = ParseAutoscaler(a, sl)
 	if err != nil {
 		return nil, err
 	}

@@ -21,6 +21,9 @@ var (
 	// label is invalid.
 	ErrInvalidMetricLabel = errors.New("labels: metric label invalid")
 
+	// ErrDuplicateMetric indicates that at least two metrics are the same.
+	ErrDuplicateMetric = errors.New("labels: duplicate metric")
+
 	// ErrNoType indicates that the parsing failed because no type was specified.
 	ErrNoType = errors.New("labels: no type specified")
 
