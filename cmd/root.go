@@ -108,22 +108,24 @@ var rootCmd = &cobra.Command{
 			return err
 		}
 
-		// API server
-		srv, err := api.New(addr)
+		// API server and Controller
+		server, err := api.New(addr)
 		if err != nil {
 			return err
 		}
-		if err = srv.Start(); err != nil {
-			return err
-		}
 
-		// Controller
 		store := startstopper.NewInMemoryMap()
 		ctrl, err := controller.New(ctrlPeriod, store)
 		if err != nil {
 			return err
 		}
-		if err = ctrl.Start(ctx); err != nil {
+
+		group := startstopper.NewGroup([]startstopper.StartStopper{
+			server,
+			ctrl,
+		})
+
+		if err = group.Start(ctx); err != nil {
 			return err
 		}
 
@@ -133,11 +135,12 @@ var rootCmd = &cobra.Command{
 		go func() {
 			<-sig
 			log.Info("Shutting down")
-			_ = ctrl.Stop(ctx)
+			err = group.Stop(ctx)
+			log.WithError(err).Error("Shutting down failed")
 		}()
 
 		log.Info("Ready")
-		return ctrl.Err(ctx)
+		return group.Err(ctx)
 	},
 }
 
