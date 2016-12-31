@@ -20,7 +20,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/mtneug/pkg/startstopper"
-	"github.com/mtneug/spate/model"
+	"github.com/mtneug/spate/event"
 )
 
 // Controller monitors Docker Swarm services and scales them if needed.
@@ -28,14 +28,14 @@ type Controller struct {
 	startstopper.StartStopper
 
 	autoscalers startstopper.Map
-	eventQueue  chan model.Event
+	eventQueue  chan event.Event
 	eventLoop   startstopper.StartStopper
 	changeLoop  startstopper.StartStopper
 }
 
 // New creates a new controller.
 func New(p time.Duration, m startstopper.Map) (*Controller, error) {
-	eq := make(chan model.Event, 20)
+	eq := make(chan event.Event, 20)
 	ctrl := &Controller{
 		autoscalers: m,
 		eventQueue:  eq,

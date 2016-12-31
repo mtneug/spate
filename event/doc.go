@@ -12,5 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package model contains spate objects.
-package model
+// Package event contains spate events.
+package event

@@ -27,7 +27,7 @@ import (
 	"github.com/mtneug/pkg/ulid"
 	"github.com/mtneug/spate/autoscaler"
 	"github.com/mtneug/spate/docker"
-	"github.com/mtneug/spate/model"
+	"github.com/mtneug/spate/event"
 )
 
 const labelSpate = "de.mtneug.spate"
@@ -44,14 +44,14 @@ type changeLoop struct {
 	startstopper.StartStopper
 
 	period         time.Duration
-	eventQueue     chan<- model.Event
+	eventQueue     chan<- event.Event
 	autoscalersMap startstopper.Map
 
 	// stored so that it doesn't need to be reallocated
 	seen map[string]bool
 }
 
-func newChangeLoop(p time.Duration, eq chan<- model.Event, m startstopper.Map) *changeLoop {
+func newChangeLoop(p time.Duration, eq chan<- event.Event, m startstopper.Map) *changeLoop {
 	cl := &changeLoop{
 		period:         p,
 		eventQueue:     eq,
@@ -92,9 +92,9 @@ func (cl *changeLoop) tick(ctx context.Context) {
 		ss, present := cl.autoscalersMap.Get(srv.ID)
 		if !present {
 			// Add
-			cl.eventQueue <- model.Event{
+			cl.eventQueue <- event.Event{
 				ID:     ulid.New().String(),
-				Type:   model.EventTypeServiceCreated,
+				Type:   event.TypeServiceCreated,
 				Object: srv,
 			}
 		} else {
@@ -108,9 +108,9 @@ func (cl *changeLoop) tick(ctx context.Context) {
 			a.RLock()
 			if a.Service.Version.Index < srv.Version.Index {
 				// Update
-				cl.eventQueue <- model.Event{
+				cl.eventQueue <- event.Event{
 					ID:     ulid.New().String(),
-					Type:   model.EventTypeServiceUpdated,
+					Type:   event.TypeServiceUpdated,
 					Object: srv,
 				}
 			}
@@ -129,9 +129,9 @@ func (cl *changeLoop) tick(ctx context.Context) {
 				return
 			}
 			a.RLock()
-			cl.eventQueue <- model.Event{
+			cl.eventQueue <- event.Event{
 				ID:     ulid.New().String(),
-				Type:   model.EventTypeServiceDeleted,
+				Type:   event.TypeServiceDeleted,
 				Object: a.Service,
 			}
 			a.RUnlock()

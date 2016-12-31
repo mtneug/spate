@@ -26,8 +26,8 @@ import (
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/mtneug/pkg/startstopper"
 	"github.com/mtneug/spate/docker"
+	"github.com/mtneug/spate/event"
 	"github.com/mtneug/spate/metric"
-	"github.com/mtneug/spate/model"
 )
 
 // ErrNoGoals indicates that no goals were specified.
@@ -94,9 +94,9 @@ func (a *Autoscaler) run(ctx context.Context, stopChan <-chan struct{}) error {
 
 	// service created/updated cooldown
 	if a.Update {
-		a.cooldown(ctx, stopChan, model.EventTypeServiceUpdated)
+		a.cooldown(ctx, stopChan, event.TypeServiceUpdated)
 	} else {
-		a.cooldown(ctx, stopChan, model.EventTypeServiceCreated)
+		a.cooldown(ctx, stopChan, event.TypeServiceCreated)
 	}
 
 	// start autoscaling
@@ -121,17 +121,17 @@ loop:
 	return err
 }
 
-func (a *Autoscaler) cooldown(ctx context.Context, stopChan <-chan struct{}, et model.EventType) {
+func (a *Autoscaler) cooldown(ctx context.Context, stopChan <-chan struct{}, et event.Type) {
 	// TODO: refactor to use map
 	var d time.Duration
 	switch et {
-	case model.EventTypeServiceCreated:
+	case event.TypeServiceCreated:
 		d = a.CooldownServiceCreated
-	case model.EventTypeServiceUpdated:
+	case event.TypeServiceUpdated:
 		d = a.CooldownServiceUpdated
-	case model.EventTypeServiceScaledUp:
+	case event.TypeServiceScaledUp:
 		d = a.CooldownServiceScaledUp
-	case model.EventTypeServiceScaledDown:
+	case event.TypeServiceScaledDown:
 		d = a.CooldownServiceScaledDown
 	}
 
@@ -220,9 +220,9 @@ func (a *Autoscaler) tick(ctx context.Context, stopChan <-chan struct{}) {
 
 	if currentScale < float64(newScale) {
 		log.Infof("Service scaled up to %d replica(s)", newScale)
-		a.cooldown(ctx, stopChan, model.EventTypeServiceScaledUp)
+		a.cooldown(ctx, stopChan, event.TypeServiceScaledUp)
 	} else {
 		log.Infof("Service scaled down to %d replica(s)", newScale)
-		a.cooldown(ctx, stopChan, model.EventTypeServiceScaledDown)
+		a.cooldown(ctx, stopChan, event.TypeServiceScaledDown)
 	}
 }

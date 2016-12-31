@@ -12,22 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package model
+package event
 
-// EventType represents some category of events.
-type EventType string
+// Type represents some category of events.
+type Type string
 
 const (
-	// EventTypeServiceCreated indicates a service creation event.
-	EventTypeServiceCreated EventType = "service_created"
-	// EventTypeServiceUpdated indicates a service update event.
-	EventTypeServiceUpdated EventType = "service_updated"
-	// EventTypeServiceDeleted indicates a service deletion event.
-	EventTypeServiceDeleted EventType = "service_deleted"
-	// EventTypeServiceScaledUp indicates a service scale up event.
-	EventTypeServiceScaledUp EventType = "service_scaled_up"
-	// EventTypeServiceScaledDown indicates a service scale down event.
-	EventTypeServiceScaledDown EventType = "service_scaled_down"
+	// TypeServiceCreated indicates a service creation event.
+	TypeServiceCreated Type = "service_created"
+	// TypeServiceUpdated indicates a service update event.
+	TypeServiceUpdated Type = "service_updated"
+	// TypeServiceDeleted indicates a service deletion event.
+	TypeServiceDeleted Type = "service_deleted"
+	// TypeServiceScaledUp indicates a service scale up event.
+	TypeServiceScaledUp Type = "service_scaled_up"
+	// TypeServiceScaledDown indicates a service scale down event.
+	TypeServiceScaledDown Type = "service_scaled_down"
 )
 
 // Event represents some incident.
@@ -35,7 +35,7 @@ type Event struct {
 	// ID of the event.
 	ID string
 	// Type of the event.
-	Type EventType
+	Type Type
 	// Object relevant to the event.
 	Object interface{}
 }
