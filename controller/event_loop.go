@@ -16,7 +16,6 @@ package controller
 
 import (
 	"context"
-	"errors"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/docker/docker/api/types/swarm"
@@ -59,13 +58,7 @@ func (el *eventLoop) run(ctx context.Context, stopChan <-chan struct{}) error {
 func (el *eventLoop) handleEvent(ctx context.Context, e event.Event) {
 	log.Debugf("Received %s event", e.Type)
 
-	srv, ok := e.Object.(swarm.Service)
-	if !ok {
-		log.
-			WithError(errors.New("controller: type assertion failed")).
-			Error("Failed to get service")
-		return
-	}
+	srv := e.Object.(swarm.Service)
 
 	var changed bool
 	var err error

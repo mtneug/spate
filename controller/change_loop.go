@@ -16,7 +16,6 @@ package controller
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
@@ -93,13 +92,7 @@ func (cl *changeLoop) tick(ctx context.Context) {
 			// Add
 			cl.eventQueue <- event.New(event.TypeServiceCreated, srv)
 		} else {
-			a, ok := ss.(*autoscaler.Autoscaler)
-			if !ok {
-				log.
-					WithError(errors.New("controller: type assertion failed")).
-					Error("Failed to get autoscaler")
-				return
-			}
+			a := ss.(*autoscaler.Autoscaler)
 			a.RLock()
 			if a.Service.Version.Index < srv.Version.Index {
 				// Update
@@ -112,13 +105,7 @@ func (cl *changeLoop) tick(ctx context.Context) {
 	cl.autoscalersMap.ForEach(func(id string, ss startstopper.StartStopper) {
 		if !cl.seen[id] {
 			// Delete
-			a, ok := ss.(*autoscaler.Autoscaler)
-			if !ok {
-				log.
-					WithError(errors.New("controller: type assertion failed")).
-					Error("Failed to get autoscaler")
-				return
-			}
+			a := ss.(*autoscaler.Autoscaler)
 			a.RLock()
 			cl.eventQueue <- event.New(event.TypeServiceDeleted, a.Service)
 			a.RUnlock()
