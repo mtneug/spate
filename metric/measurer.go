@@ -28,7 +28,7 @@ import (
 	"github.com/mtneug/pkg/reducer"
 	"github.com/mtneug/spate/docker"
 	"github.com/prometheus/common/expfmt"
-	prometheusModel "github.com/prometheus/common/model"
+	"github.com/prometheus/common/model"
 )
 
 // CriticalFailurePercentage indicates for a replica metric how many
@@ -206,14 +206,14 @@ func (m *PrometheusMeasurer) Measure(ctx context.Context) (float64, error) {
 	return sum, nil
 }
 
-func decodeAndFindPrometheusSample(r io.Reader, metricName string) (*prometheusModel.Sample, error) {
+func decodeAndFindPrometheusSample(r io.Reader, metricName string) (*model.Sample, error) {
 	dec := expfmt.SampleDecoder{
 		Dec:  expfmt.NewDecoder(r, expfmt.FmtText),
 		Opts: &expfmt.DecodeOptions{},
 	}
 
 	for {
-		var vec prometheusModel.Vector
+		var vec model.Vector
 
 		err := dec.Decode(&vec)
 		if err != nil {
@@ -228,8 +228,8 @@ func decodeAndFindPrometheusSample(r io.Reader, metricName string) (*prometheusM
 		}
 
 		sample := vec[0]
-		name := sample.Metric[prometheusModel.MetricNameLabel]
-		if name == prometheusModel.LabelValue(metricName) {
+		name := sample.Metric[model.MetricNameLabel]
+		if name == model.LabelValue(metricName) {
 			return sample, nil
 		}
 	}
