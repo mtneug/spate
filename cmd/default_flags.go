@@ -17,7 +17,7 @@ package cmd
 import (
 	"time"
 
-	"github.com/mtneug/spate/labels"
+	"github.com/mtneug/spate/label"
 	flag "github.com/spf13/pflag"
 )
 
@@ -27,7 +27,7 @@ func readAndSetDefaults(flags *flag.FlagSet) error {
 	if err != nil {
 		return err
 	}
-	labels.DefaultObserverAggregationAmount = defaultAggregationAmount
+	label.DefaultObserverAggregationAmount = defaultAggregationAmount
 
 	// --default-autoscaler-period
 	defaultAutoscalerPeriodStr, err := flags.GetString("default-autoscaler-period")
@@ -38,7 +38,7 @@ func readAndSetDefaults(flags *flag.FlagSet) error {
 	if err != nil {
 		return err
 	}
-	labels.DefaultAutoscalerPeriod = defaultAutoscalerPeriod
+	label.DefaultAutoscalerPeriod = defaultAutoscalerPeriod
 
 	// --default-cooldown-scaled_up
 	defaultCooldownScaledUpStr, err := flags.GetString("default-cooldown-scaled_up")
@@ -49,7 +49,7 @@ func readAndSetDefaults(flags *flag.FlagSet) error {
 	if err != nil {
 		return err
 	}
-	labels.DefaultCooldownScaledUp = defaultCooldownScaledUp
+	label.DefaultCooldownScaledUp = defaultCooldownScaledUp
 
 	// --default-cooldown-scaled_down
 	defaultCooldownScaledDownStr, err := flags.GetString("default-cooldown-scaled_down")
@@ -60,7 +60,7 @@ func readAndSetDefaults(flags *flag.FlagSet) error {
 	if err != nil {
 		return err
 	}
-	labels.DefaultCooldownScaledDown = defaultCooldownScaledDown
+	label.DefaultCooldownScaledDown = defaultCooldownScaledDown
 
 	// --default-cooldown-service_added
 	defaultCooldownServiceAddedStr, err := flags.GetString("default-cooldown-service_added")
@@ -71,7 +71,7 @@ func readAndSetDefaults(flags *flag.FlagSet) error {
 	if err != nil {
 		return err
 	}
-	labels.DefaultCooldownServiceAdded = defaultCooldownServiceAdded
+	label.DefaultCooldownServiceAdded = defaultCooldownServiceAdded
 
 	// --default-cooldown-service_updated
 	defaultCooldownServiceUpdatedStr, err := flags.GetString("default-cooldown-service_updated")
@@ -82,7 +82,7 @@ func readAndSetDefaults(flags *flag.FlagSet) error {
 	if err != nil {
 		return err
 	}
-	labels.DefaultCooldownServiceUpdated = defaultCooldownServiceUpdated
+	label.DefaultCooldownServiceUpdated = defaultCooldownServiceUpdated
 
 	// --default-observer-period
 	defaultObserverPeriodStr, err := flags.GetString("default-observer-period")
@@ -93,7 +93,7 @@ func readAndSetDefaults(flags *flag.FlagSet) error {
 	if err != nil {
 		return err
 	}
-	labels.DefaultObserverPeriod = defaultObserverPeriod
+	label.DefaultObserverPeriod = defaultObserverPeriod
 
 	return nil
 }

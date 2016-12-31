@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package labels_test
+package label_test
 
 import (
 	"testing"
 
-	"github.com/mtneug/spate/labels"
+	"github.com/mtneug/spate/label"
 	"github.com/mtneug/spate/metric"
 	"github.com/stretchr/testify/require"
 )
@@ -33,43 +33,43 @@ func TestParseTarget(t *testing.T) {
 		// error
 		{
 			labels: nil,
-			err:    labels.ErrNoValue,
+			err:    label.ErrNoValue,
 		},
 		{
 			labels: map[string]string{"type": "prometheus"},
-			err:    labels.ErrNoValue,
+			err:    label.ErrNoValue,
 		},
 		{
 			labels: map[string]string{"target": "NaN"},
-			err:    labels.ErrInvalidFloat,
+			err:    label.ErrInvalidFloat,
 		},
 		{
 			labels: map[string]string{
 				"target":                 "42",
 				"target.deviation.lower": "NaN",
 			},
-			err: labels.ErrInvalidDeviation,
+			err: label.ErrInvalidDeviation,
 		},
 		{
 			labels: map[string]string{
 				"target":                 "42",
 				"target.deviation.lower": "-1",
 			},
-			err: labels.ErrInvalidDeviation,
+			err: label.ErrInvalidDeviation,
 		},
 		{
 			labels: map[string]string{
 				"target":                 "42",
 				"target.deviation.upper": "NaN",
 			},
-			err: labels.ErrInvalidDeviation,
+			err: label.ErrInvalidDeviation,
 		},
 		{
 			labels: map[string]string{
 				"target":                 "42",
 				"target.deviation.upper": "-1",
 			},
-			err: labels.ErrInvalidDeviation,
+			err: label.ErrInvalidDeviation,
 		},
 
 		// ok
@@ -191,7 +191,7 @@ func TestParseTarget(t *testing.T) {
 
 	for _, c := range testCases {
 		target := metric.Target{}
-		err := labels.ParseTarget(&target, c.labels)
+		err := label.ParseTarget(&target, c.labels)
 
 		require.Equal(t, c.err, err)
 		if c.err == nil {

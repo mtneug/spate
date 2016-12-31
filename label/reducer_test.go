@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package labels_test
+package label_test
 
 import (
 	"testing"
 
-	"github.com/mtneug/spate/labels"
+	"github.com/mtneug/spate/label"
 	"github.com/stretchr/testify/require"
 )
 
@@ -30,7 +30,7 @@ func TestParseReducer(t *testing.T) {
 	}{
 		{
 			labels: map[string]string{"aggregation.method": "unknown"},
-			err:    labels.ErrUnknownAggregationMethod,
+			err:    label.ErrUnknownAggregationMethod,
 		},
 		{
 			labels: map[string]string{},
@@ -51,7 +51,7 @@ func TestParseReducer(t *testing.T) {
 	}
 
 	for _, c := range testCases {
-		_, err := labels.ParseReducer(c.labels)
+		_, err := label.ParseReducer(c.labels)
 		require.Equal(t, c.err, err)
 	}
 }

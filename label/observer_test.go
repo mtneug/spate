@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package labels_test
+package label_test
 
 import (
 	"testing"
 	"time"
 
-	"github.com/mtneug/spate/labels"
+	"github.com/mtneug/spate/label"
 	"github.com/mtneug/spate/metric"
 	"github.com/stretchr/testify/require"
 )
@@ -34,11 +34,11 @@ func TestParseObserver(t *testing.T) {
 
 		{
 			label: map[string]string{"observer.period": "abc"},
-			err:   labels.ErrInvalidDuration,
+			err:   label.ErrInvalidDuration,
 		},
 		{
 			label: map[string]string{"aggregation.amount": "abc"},
-			err:   labels.ErrInvalidUint,
+			err:   label.ErrInvalidUint,
 		},
 		{
 			label: map[string]string{},
@@ -63,7 +63,7 @@ func TestParseObserver(t *testing.T) {
 
 	for _, c := range testCases {
 		observer := metric.Observer{}
-		err := labels.ParseObserver(&observer, c.label)
+		err := label.ParseObserver(&observer, c.label)
 		require.Equal(t, c.err, err)
 		if c.err == nil {
 			require.Equal(t, c.observer, observer)

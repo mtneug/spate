@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package labels_test
+package label_test
 
 import (
 	"net/url"
 	"testing"
 
-	"github.com/mtneug/spate/labels"
+	"github.com/mtneug/spate/label"
 	"github.com/mtneug/spate/metric"
 	"github.com/stretchr/testify/require"
 )
@@ -37,47 +37,47 @@ func TestParseMetric(t *testing.T) {
 		// errors
 		{
 			labels: nil,
-			err:    labels.ErrNoType,
+			err:    label.ErrNoType,
 		},
 		{
 			labels: map[string]string{
 				"type": "unknown",
 			},
-			err: labels.ErrUnknownType,
+			err: label.ErrUnknownType,
 		},
 		{
 			labels: map[string]string{
 				"type": "prometheus",
 			},
-			err: labels.ErrNoKind,
+			err: label.ErrNoKind,
 		},
 		{
 			labels: map[string]string{
 				"type": "prometheus",
 				"kind": "unknown",
 			},
-			err: labels.ErrUnknownKind,
+			err: label.ErrUnknownKind,
 		},
 		{
 			labels: map[string]string{
 				"type": "cpu",
 				"kind": "system",
 			},
-			err: labels.ErrWrongKind,
+			err: label.ErrWrongKind,
 		},
 		{
 			labels: map[string]string{
 				"type": "memory",
 				"kind": "system",
 			},
-			err: labels.ErrWrongKind,
+			err: label.ErrWrongKind,
 		},
 		{
 			labels: map[string]string{
 				"type": "prometheus",
 				"kind": "system",
 			},
-			err: labels.ErrNoPrometheusEndpoint,
+			err: label.ErrNoPrometheusEndpoint,
 		},
 		{
 			labels: map[string]string{
@@ -85,7 +85,7 @@ func TestParseMetric(t *testing.T) {
 				"kind":                "system",
 				"prometheus.endpoint": "ftp://why",
 			},
-			err: labels.ErrInvalidHTTPUrl,
+			err: label.ErrInvalidHTTPUrl,
 		},
 		{
 			labels: map[string]string{
@@ -93,7 +93,7 @@ func TestParseMetric(t *testing.T) {
 				"kind":                "system",
 				"prometheus.endpoint": testUrlStr,
 			},
-			err: labels.ErrNoPrometheusMetricName,
+			err: label.ErrNoPrometheusMetricName,
 		},
 
 		// cpu
@@ -181,7 +181,7 @@ func TestParseMetric(t *testing.T) {
 
 	for _, c := range testCases {
 		m := metric.Metric{}
-		err := labels.ParseMetric(&m, c.labels)
+		err := label.ParseMetric(&m, c.labels)
 		require.Equal(t, c.err, err)
 		if c.err == nil {
 			require.Equal(t, c.metric, m)

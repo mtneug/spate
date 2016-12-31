@@ -12,6 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package labels contains code for parsing spate service labels and
-// constructing objects out of them.
-package labels
+package label
+
+import "github.com/mtneug/pkg/reducer"
+
+// ParseReducer parses the labels and returnes the correct reducer.
+func ParseReducer(labels map[string]string) (reducer.Reducer, error) {
+	aggregationMethodStr, ok := labels[MetricAggregationMethodSuffix]
+	if !ok {
+		return reducer.Avg(), nil
+	}
+
+	switch aggregationMethodStr {
+	case MetricAggregationMethodMax:
+		return reducer.Max(), nil
+	case MetricAggregationMethodMin:
+		return reducer.Min(), nil
+	case MetricAggregationMethodAvg:
+		return reducer.Avg(), nil
+	}
+
+	return nil, ErrUnknownAggregationMethod
+}

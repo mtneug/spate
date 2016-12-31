@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package labels_test
+package label_test
 
 import (
 	"math"
@@ -20,7 +20,7 @@ import (
 	"time"
 
 	"github.com/mtneug/spate/autoscaler"
-	"github.com/mtneug/spate/labels"
+	"github.com/mtneug/spate/label"
 	"github.com/stretchr/testify/require"
 )
 
@@ -34,31 +34,31 @@ func TestParseAutoscaler(t *testing.T) {
 	}{
 		{
 			labels: map[string]string{"autoscaler.period": "abc"},
-			err:    labels.ErrInvalidDuration,
+			err:    label.ErrInvalidDuration,
 		},
 		{
 			labels: map[string]string{"autoscaler.cooldown.scaled_up": "abc"},
-			err:    labels.ErrInvalidDuration,
+			err:    label.ErrInvalidDuration,
 		},
 		{
 			labels: map[string]string{"autoscaler.cooldown.scaled_down": "abc"},
-			err:    labels.ErrInvalidDuration,
+			err:    label.ErrInvalidDuration,
 		},
 		{
 			labels: map[string]string{"autoscaler.cooldown.service_added": "abc"},
-			err:    labels.ErrInvalidDuration,
+			err:    label.ErrInvalidDuration,
 		},
 		{
 			labels: map[string]string{"autoscaler.cooldown.service_updated": "abc"},
-			err:    labels.ErrInvalidDuration,
+			err:    label.ErrInvalidDuration,
 		},
 		{
 			labels: map[string]string{"replicas.min": "abc"},
-			err:    labels.ErrInvalidUint,
+			err:    label.ErrInvalidUint,
 		},
 		{
 			labels: map[string]string{"replicas.max": "abc"},
-			err:    labels.ErrInvalidUint,
+			err:    label.ErrInvalidUint,
 		},
 		{
 			labels: nil,
@@ -98,7 +98,7 @@ func TestParseAutoscaler(t *testing.T) {
 
 	for _, c := range testCases {
 		autoscaler := autoscaler.Autoscaler{}
-		err := labels.ParseAutoscaler(&autoscaler, c.labels)
+		err := label.ParseAutoscaler(&autoscaler, c.labels)
 		require.Equal(t, c.err, err)
 		if c.err == nil {
 			require.Equal(t, c.autoscaler, autoscaler)
