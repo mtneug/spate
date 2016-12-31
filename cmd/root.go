@@ -109,9 +109,7 @@ var rootCmd = &cobra.Command{
 		}
 
 		// API server
-		srv, err := api.New(&api.Config{
-			Addr: addr,
-		})
+		srv, err := api.New(addr)
 		if err != nil {
 			return err
 		}

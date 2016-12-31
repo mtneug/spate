@@ -23,26 +23,22 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-// Config for a spate API server.
-type Config struct {
-	Addr string
-}
-
 // Server implements a spate API server.
 type Server struct {
-	config   *Config
+	Addr string
+
 	server   *http.Server
 	err      error
 	doneChan chan struct{}
 }
 
 // New creates a new server.
-func New(c *Config) (*Server, error) {
+func New(addr string) (*Server, error) {
 	mux := http.NewServeMux()
 	mux.Handle("/metrics", prometheus.Handler())
 	// TODO: connect ErrorLog to logrus
 	srv := &Server{
-		config:   c,
+		Addr:     addr,
 		server:   &http.Server{Handler: mux},
 		doneChan: make(chan struct{}),
 	}
@@ -52,7 +48,7 @@ func New(c *Config) (*Server, error) {
 
 // Start the API server and listens for requests.
 func (s *Server) Start() error {
-	ln, err := net.Listen("tcp", s.config.Addr)
+	ln, err := net.Listen("tcp", s.Addr)
 	if err != nil {
 		return err
 	}
