@@ -24,7 +24,6 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/mtneug/pkg/startstopper"
-	"github.com/mtneug/pkg/ulid"
 	"github.com/mtneug/spate/autoscaler"
 	"github.com/mtneug/spate/docker"
 	"github.com/mtneug/spate/event"
@@ -92,11 +91,7 @@ func (cl *changeLoop) tick(ctx context.Context) {
 		ss, present := cl.autoscalersMap.Get(srv.ID)
 		if !present {
 			// Add
-			cl.eventQueue <- event.Event{
-				ID:     ulid.New().String(),
-				Type:   event.TypeServiceCreated,
-				Object: srv,
-			}
+			cl.eventQueue <- event.New(event.TypeServiceCreated, srv)
 		} else {
 			a, ok := ss.(*autoscaler.Autoscaler)
 			if !ok {
@@ -108,11 +103,7 @@ func (cl *changeLoop) tick(ctx context.Context) {
 			a.RLock()
 			if a.Service.Version.Index < srv.Version.Index {
 				// Update
-				cl.eventQueue <- event.Event{
-					ID:     ulid.New().String(),
-					Type:   event.TypeServiceUpdated,
-					Object: srv,
-				}
+				cl.eventQueue <- event.New(event.TypeServiceUpdated, srv)
 			}
 			a.RUnlock()
 		}
@@ -129,11 +120,7 @@ func (cl *changeLoop) tick(ctx context.Context) {
 				return
 			}
 			a.RLock()
-			cl.eventQueue <- event.Event{
-				ID:     ulid.New().String(),
-				Type:   event.TypeServiceDeleted,
-				Object: a.Service,
-			}
+			cl.eventQueue <- event.New(event.TypeServiceDeleted, a.Service)
 			a.RUnlock()
 		}
 		delete(cl.seen, id)

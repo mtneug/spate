@@ -14,6 +14,8 @@
 
 package event
 
+import "github.com/mtneug/pkg/ulid"
+
 // Type represents some category of events.
 type Type string
 
@@ -38,4 +40,13 @@ type Event struct {
 	Type Type
 	// Object relevant to the event.
 	Object interface{}
+}
+
+// New creates a new event.
+func New(t Type, obj interface{}) Event {
+	return Event{
+		ID:     ulid.New().String(),
+		Type:   t,
+		Object: obj,
+	}
 }
