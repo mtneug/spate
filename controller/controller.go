@@ -34,7 +34,8 @@ type Controller struct {
 }
 
 // New creates a new controller.
-func New(p time.Duration, m startstopper.Map) (*Controller, error) {
+func New(p time.Duration) (*Controller, error) {
+	m := startstopper.NewInMemoryMap()
 	eq := make(chan event.Event, 20)
 	ctrl := &Controller{
 		autoscalers: m,

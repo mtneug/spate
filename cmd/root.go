@@ -114,8 +114,7 @@ var rootCmd = &cobra.Command{
 			return err
 		}
 
-		store := startstopper.NewInMemoryMap()
-		ctrl, err := controller.New(ctrlPeriod, store)
+		ctrl, err := controller.New(ctrlPeriod)
 		if err != nil {
 			return err
 		}

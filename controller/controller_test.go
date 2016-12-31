@@ -19,7 +19,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mtneug/pkg/startstopper"
 	"github.com/mtneug/pkg/startstopper/testutils"
 	"github.com/stretchr/testify/require"
 )
@@ -28,9 +27,8 @@ func TestNew(t *testing.T) {
 	t.Parallel()
 
 	p := time.Second
-	m := startstopper.NewInMemoryMap()
 
-	ctrl, err := New(p, m)
+	ctrl, err := New(p)
 	require.NotNil(t, ctrl)
 	require.NoError(t, err)
 
@@ -52,7 +50,7 @@ func TestController(t *testing.T) {
 	eventLoop.On("Start", ctx).Return(nil).Once()
 	eventLoop.On("Stop", ctx).Return(nil).Once()
 
-	ctrl, _ := New(time.Second, startstopper.NewInMemoryMap())
+	ctrl, _ := New(time.Second)
 	ctrl.changeLoop = changeLoop
 	ctrl.eventLoop = eventLoop
 
