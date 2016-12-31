@@ -19,7 +19,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/mtneug/spate/api/types"
+	"github.com/mtneug/spate/model"
 )
 
 var (
@@ -34,7 +34,7 @@ var (
 
 // ParseTarget parses the labels and sets the corresponding values for given
 // target.
-func ParseTarget(target *types.Target, labels map[string]string) error {
+func ParseTarget(target *model.Target, labels map[string]string) error {
 	// value
 	var (
 		ok          bool
@@ -52,11 +52,11 @@ func ParseTarget(target *types.Target, labels map[string]string) error {
 			return ErrNoValue
 		}
 
-		switch types.MetricType(metricTypeStr) {
-		case types.MetricTypeCPU:
+		switch model.MetricType(metricTypeStr) {
+		case model.MetricTypeCPU:
 			value = DefaultTargetValueCPU
 			valueParsed = true
-		case types.MetricTypeMemory:
+		case model.MetricTypeMemory:
 			value = DefaultTargetValueMemory
 			valueParsed = true
 		default:

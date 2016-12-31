@@ -19,7 +19,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mtneug/spate/api/types"
+	"github.com/mtneug/spate/model"
 	"github.com/stretchr/testify/require"
 )
 
@@ -27,7 +27,7 @@ func TestChangeLoopRun(t *testing.T) {
 	t.Parallel()
 	t.Skip("Refactor so that the Docker Client can be mocked")
 
-	eq := make(chan types.Event)
+	eq := make(chan model.Event)
 	cl := newChangeLoop(time.Second, eq, nil)
 
 	// stopChan

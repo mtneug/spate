@@ -21,14 +21,14 @@ import (
 
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/mtneug/pkg/startstopper/testutils"
-	"github.com/mtneug/spate/api/types"
+	"github.com/mtneug/spate/model"
 	"github.com/stretchr/testify/require"
 )
 
 func TestEventLoopRun(t *testing.T) {
 	t.Parallel()
 
-	eq := make(chan types.Event)
+	eq := make(chan model.Event)
 	el := newEventLoop(eq, nil)
 
 	// stopChan
@@ -51,7 +51,7 @@ func TestEventLoopRun(t *testing.T) {
 		require.NoError(t, err)
 	}()
 	go func() {
-		eq <- types.Event{}
+		eq <- model.Event{}
 		close(done)
 	}()
 	select {
@@ -67,7 +67,7 @@ func TestHandleEventUnknownEvent(t *testing.T) {
 
 	ctx := context.Background()
 
-	e := types.Event{
+	e := model.Event{
 		ID:     "test",
 		Type:   "test_event",
 		Object: nil,
@@ -96,9 +96,9 @@ func TestHandleEventServiceCreated(t *testing.T) {
 			},
 		},
 	}
-	e := types.Event{
+	e := model.Event{
 		ID:     "test",
-		Type:   types.EventTypeServiceCreated,
+		Type:   model.EventTypeServiceCreated,
 		Object: srv,
 	}
 
@@ -126,9 +126,9 @@ func TestHandleEventServiceUpdated(t *testing.T) {
 			},
 		},
 	}
-	e := types.Event{
+	e := model.Event{
 		ID:     "test",
-		Type:   types.EventTypeServiceUpdated,
+		Type:   model.EventTypeServiceUpdated,
 		Object: srv,
 	}
 
@@ -149,9 +149,9 @@ func TestHandleEventServiceDeleted(t *testing.T) {
 	srv := swarm.Service{
 		ID: "testSrv",
 	}
-	e := types.Event{
+	e := model.Event{
 		ID:     "test",
-		Type:   types.EventTypeServiceDeleted,
+		Type:   model.EventTypeServiceDeleted,
 		Object: srv,
 	}
 

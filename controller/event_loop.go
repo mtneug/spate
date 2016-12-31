@@ -21,17 +21,17 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/mtneug/pkg/startstopper"
-	"github.com/mtneug/spate/api/types"
+	"github.com/mtneug/spate/model"
 )
 
 type eventLoop struct {
 	startstopper.StartStopper
 
-	eventQueue  <-chan types.Event
+	eventQueue  <-chan model.Event
 	autoscalers startstopper.Map
 }
 
-func newEventLoop(eq <-chan types.Event, m startstopper.Map) *eventLoop {
+func newEventLoop(eq <-chan model.Event, m startstopper.Map) *eventLoop {
 	el := &eventLoop{
 		eventQueue:  eq,
 		autoscalers: m,
@@ -56,7 +56,7 @@ func (el *eventLoop) run(ctx context.Context, stopChan <-chan struct{}) error {
 	}
 }
 
-func (el *eventLoop) handleEvent(ctx context.Context, e types.Event) {
+func (el *eventLoop) handleEvent(ctx context.Context, e model.Event) {
 	log.Debugf("Received %s event", e.Type)
 
 	srv, ok := e.Object.(swarm.Service)
@@ -71,21 +71,21 @@ func (el *eventLoop) handleEvent(ctx context.Context, e types.Event) {
 	var err error
 
 	switch e.Type {
-	case types.EventTypeServiceCreated:
+	case model.EventTypeServiceCreated:
 		changed, err = el.addAutoscaler(ctx, srv)
 		if err != nil {
 			log.WithError(err).Error("Could not add autoscaler")
 		} else {
 			log.Info("Autoscaler added")
 		}
-	case types.EventTypeServiceUpdated:
+	case model.EventTypeServiceUpdated:
 		changed, err = el.updateAutoscaler(ctx, srv)
 		if err != nil {
 			log.WithError(err).Error("Could not update autoscaler")
 		} else {
 			log.Info("Autoscaler updated")
 		}
-	case types.EventTypeServiceDeleted:
+	case model.EventTypeServiceDeleted:
 		changed, err = el.deleteAutoscaler(ctx, srv)
 		if err != nil {
 			log.WithError(err).Error("Could not delete autoscaler")

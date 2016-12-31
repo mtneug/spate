@@ -23,13 +23,13 @@ import (
 	"net/http"
 	"sync"
 
-	dockerTypes "github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/mtneug/pkg/reducer"
-	"github.com/mtneug/spate/api/types"
 	"github.com/mtneug/spate/docker"
+	"github.com/mtneug/spate/model"
 	"github.com/prometheus/common/expfmt"
-	"github.com/prometheus/common/model"
+	prometheusModel "github.com/prometheus/common/model"
 )
 
 // CriticalFailurePercentage indicates for a replica metric how many
@@ -53,13 +53,13 @@ type Measurer interface {
 }
 
 // NewMeasurer creates the right measurer for given metric.
-func NewMeasurer(serviceID, serviceName string, metric types.Metric) (measurer Measurer, err error) {
+func NewMeasurer(serviceID, serviceName string, metric model.Metric) (measurer Measurer, err error) {
 	switch metric.Type {
-	case types.MetricTypeCPU:
+	case model.MetricTypeCPU:
 		measurer = &CPUMeasurer{ServiceID: serviceID, ServiceName: serviceName, Metric: metric}
-	case types.MetricTypeMemory:
+	case model.MetricTypeMemory:
 		measurer = &MemoryMeasurer{ServiceID: serviceID, ServiceName: serviceName, Metric: metric}
-	case types.MetricTypePrometheus:
+	case model.MetricTypePrometheus:
 		measurer = &PrometheusMeasurer{ServiceID: serviceID, ServiceName: serviceName, Metric: metric}
 	default:
 		err = ErrUnknownType
@@ -71,7 +71,7 @@ func NewMeasurer(serviceID, serviceName string, metric types.Metric) (measurer M
 type CPUMeasurer struct {
 	ServiceID   string
 	ServiceName string
-	Metric      types.Metric
+	Metric      model.Metric
 }
 
 // Measure the CPU utilization.
@@ -84,7 +84,7 @@ func (m *CPUMeasurer) Measure(ctx context.Context) (float64, error) {
 type MemoryMeasurer struct {
 	ServiceID   string
 	ServiceName string
-	Metric      types.Metric
+	Metric      model.Metric
 }
 
 // Measure the memory utilization.
@@ -97,7 +97,7 @@ func (m *MemoryMeasurer) Measure(ctx context.Context) (float64, error) {
 type PrometheusMeasurer struct {
 	ServiceID   string
 	ServiceName string
-	Metric      types.Metric
+	Metric      model.Metric
 	client      http.Client
 }
 
@@ -107,15 +107,15 @@ func (m *PrometheusMeasurer) Measure(ctx context.Context) (float64, error) {
 	var expectedNMeasurements int
 
 	switch m.Metric.Kind {
-	case types.MetricKindSystem:
+	case model.MetricKindSystem:
 		expectedNMeasurements = 1
 
-	case types.MetricKindReplica:
+	case model.MetricKindReplica:
 		args := filters.NewArgs()
 		args.Add("service", m.ServiceID)
 		args.Add("desired-state", "running")
 
-		tasks, err := docker.C.TaskList(ctx, dockerTypes.TaskListOptions{Filter: args})
+		tasks, err := docker.C.TaskList(ctx, types.TaskListOptions{Filter: args})
 		if err != nil {
 			return 0, err
 		}
@@ -207,14 +207,14 @@ func (m *PrometheusMeasurer) Measure(ctx context.Context) (float64, error) {
 	return sum, nil
 }
 
-func decodeAndFindPrometheusSample(r io.Reader, metricName string) (*model.Sample, error) {
+func decodeAndFindPrometheusSample(r io.Reader, metricName string) (*prometheusModel.Sample, error) {
 	dec := expfmt.SampleDecoder{
 		Dec:  expfmt.NewDecoder(r, expfmt.FmtText),
 		Opts: &expfmt.DecodeOptions{},
 	}
 
 	for {
-		var vec model.Vector
+		var vec prometheusModel.Vector
 
 		err := dec.Decode(&vec)
 		if err != nil {
@@ -229,8 +229,8 @@ func decodeAndFindPrometheusSample(r io.Reader, metricName string) (*model.Sampl
 		}
 
 		sample := vec[0]
-		name := sample.Metric[model.MetricNameLabel]
-		if name == model.LabelValue(metricName) {
+		name := sample.Metric[prometheusModel.MetricNameLabel]
+		if name == prometheusModel.LabelValue(metricName) {
 			return sample, nil
 		}
 	}

@@ -21,37 +21,37 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	dockerTypes "github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/mtneug/pkg/startstopper"
 	"github.com/mtneug/pkg/ulid"
-	"github.com/mtneug/spate/api/types"
 	"github.com/mtneug/spate/autoscaler"
 	"github.com/mtneug/spate/docker"
+	"github.com/mtneug/spate/model"
 )
 
 const labelSpate = "de.mtneug.spate"
 
-var serviceListOptions dockerTypes.ServiceListOptions
+var serviceListOptions types.ServiceListOptions
 
 func init() {
 	f := filters.NewArgs()
 	f.Add("label", fmt.Sprintf("%s=%s", labelSpate, "enable"))
-	serviceListOptions = dockerTypes.ServiceListOptions{Filter: f}
+	serviceListOptions = types.ServiceListOptions{Filter: f}
 }
 
 type changeLoop struct {
 	startstopper.StartStopper
 
 	period         time.Duration
-	eventQueue     chan<- types.Event
+	eventQueue     chan<- model.Event
 	autoscalersMap startstopper.Map
 
 	// stored so that it doesn't need to be reallocated
 	seen map[string]bool
 }
 
-func newChangeLoop(p time.Duration, eq chan<- types.Event, m startstopper.Map) *changeLoop {
+func newChangeLoop(p time.Duration, eq chan<- model.Event, m startstopper.Map) *changeLoop {
 	cl := &changeLoop{
 		period:         p,
 		eventQueue:     eq,
@@ -92,9 +92,9 @@ func (cl *changeLoop) tick(ctx context.Context) {
 		ss, present := cl.autoscalersMap.Get(srv.ID)
 		if !present {
 			// Add
-			cl.eventQueue <- types.Event{
+			cl.eventQueue <- model.Event{
 				ID:     ulid.New().String(),
-				Type:   types.EventTypeServiceCreated,
+				Type:   model.EventTypeServiceCreated,
 				Object: srv,
 			}
 		} else {
@@ -108,9 +108,9 @@ func (cl *changeLoop) tick(ctx context.Context) {
 			a.RLock()
 			if a.Service.Version.Index < srv.Version.Index {
 				// Update
-				cl.eventQueue <- types.Event{
+				cl.eventQueue <- model.Event{
 					ID:     ulid.New().String(),
-					Type:   types.EventTypeServiceUpdated,
+					Type:   model.EventTypeServiceUpdated,
 					Object: srv,
 				}
 			}
@@ -129,9 +129,9 @@ func (cl *changeLoop) tick(ctx context.Context) {
 				return
 			}
 			a.RLock()
-			cl.eventQueue <- types.Event{
+			cl.eventQueue <- model.Event{
 				ID:     ulid.New().String(),
-				Type:   types.EventTypeServiceDeleted,
+				Type:   model.EventTypeServiceDeleted,
 				Object: a.Service,
 			}
 			a.RUnlock()

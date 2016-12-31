@@ -16,12 +16,12 @@ package metric
 
 import (
 	"github.com/mtneug/pkg/ulid"
-	"github.com/mtneug/spate/api/types"
+	"github.com/mtneug/spate/model"
 )
 
 // New creates a new metric.
-func New(name string) types.Metric {
-	m := types.Metric{
+func New(name string) model.Metric {
+	m := model.Metric{
 		ID:   ulid.New().String(),
 		Name: name,
 	}

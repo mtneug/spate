@@ -17,55 +17,55 @@ package labels
 import (
 	"net/url"
 
-	"github.com/mtneug/spate/api/types"
+	"github.com/mtneug/spate/model"
 )
 
 // ParseMetric parses the labels and sets the corresponding values for given
 // metric.
-func ParseMetric(metric *types.Metric, labels map[string]string) error {
+func ParseMetric(metric *model.Metric, labels map[string]string) error {
 	typeStr, ok := labels[MetricTypeSuffix]
 	if !ok {
 		return ErrNoType
 	}
 
-	switch types.MetricType(typeStr) {
-	case types.MetricTypeCPU:
+	switch model.MetricType(typeStr) {
+	case model.MetricTypeCPU:
 		return parseCPUMetric(metric, labels)
-	case types.MetricTypeMemory:
+	case model.MetricTypeMemory:
 		return parseMemoryMetric(metric, labels)
-	case types.MetricTypePrometheus:
+	case model.MetricTypePrometheus:
 		return parsePrometheusMetric(metric, labels)
 	}
 
 	return ErrUnknownType
 }
 
-func parseCPUMetric(metric *types.Metric, labels map[string]string) error {
-	metric.Type = types.MetricTypeCPU
+func parseCPUMetric(metric *model.Metric, labels map[string]string) error {
+	metric.Type = model.MetricTypeCPU
 
 	kindStr, ok := labels[MetricKindSuffix]
-	if ok && kindStr != string(types.MetricKindReplica) {
+	if ok && kindStr != string(model.MetricKindReplica) {
 		return ErrWrongKind
 	}
-	metric.Kind = types.MetricKindReplica
+	metric.Kind = model.MetricKindReplica
 
 	return nil
 }
 
-func parseMemoryMetric(metric *types.Metric, labels map[string]string) error {
-	metric.Type = types.MetricTypeMemory
+func parseMemoryMetric(metric *model.Metric, labels map[string]string) error {
+	metric.Type = model.MetricTypeMemory
 
 	kindStr, ok := labels[MetricKindSuffix]
-	if ok && kindStr != string(types.MetricKindReplica) {
+	if ok && kindStr != string(model.MetricKindReplica) {
 		return ErrWrongKind
 	}
-	metric.Kind = types.MetricKindReplica
+	metric.Kind = model.MetricKindReplica
 
 	return nil
 }
 
-func parsePrometheusMetric(metric *types.Metric, labels map[string]string) error {
-	metric.Type = types.MetricTypePrometheus
+func parsePrometheusMetric(metric *model.Metric, labels map[string]string) error {
+	metric.Type = model.MetricTypePrometheus
 
 	// Kind
 	kindStr, ok := labels[MetricKindSuffix]
@@ -73,7 +73,7 @@ func parsePrometheusMetric(metric *types.Metric, labels map[string]string) error
 		return ErrNoKind
 	}
 
-	kind := types.MetricKind(kindStr)
+	kind := model.MetricKind(kindStr)
 	ok = validMetricKind(kind)
 	if !ok {
 		return ErrUnknownKind
@@ -102,7 +102,7 @@ func parsePrometheusMetric(metric *types.Metric, labels map[string]string) error
 	return nil
 }
 
-func validMetricKind(kind types.MetricKind) (ok bool) {
-	return kind == types.MetricKindSystem ||
-		kind == types.MetricKindReplica
+func validMetricKind(kind model.MetricKind) (ok bool) {
+	return kind == model.MetricKindSystem ||
+		kind == model.MetricKindReplica
 }

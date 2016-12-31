@@ -12,16 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package types
-
-// Target represents a target.
-type Target struct {
-	// Value of the target.
-	Value float64
-
-	// UpperDeviation allowed from the target.
-	UpperDeviation float64
-
-	// LowerDeviation allowed from the target.
-	LowerDeviation float64
-}
+// Package model contains spate objects.
+package model

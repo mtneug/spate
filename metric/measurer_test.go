@@ -17,8 +17,8 @@ package metric_test
 import (
 	"testing"
 
-	"github.com/mtneug/spate/api/types"
 	"github.com/mtneug/spate/metric"
+	"github.com/mtneug/spate/model"
 	"github.com/stretchr/testify/require"
 )
 
@@ -28,22 +28,22 @@ func TestNewMeasurer(t *testing.T) {
 	serviceID := "bv24k4vkkdnch70zpt81ia4kz"
 	serviceName := "test_service_name"
 
-	m := types.Metric{}
+	m := model.Metric{}
 	measurer, err := metric.NewMeasurer(serviceID, serviceName, m)
 	require.EqualError(t, metric.ErrUnknownType, err.Error())
 	require.Nil(t, measurer)
 
-	m = types.Metric{Type: types.MetricTypeCPU}
+	m = model.Metric{Type: model.MetricTypeCPU}
 	measurer, err = metric.NewMeasurer(serviceID, serviceName, m)
 	require.NoError(t, err)
 	require.IsType(t, &metric.CPUMeasurer{}, measurer)
 
-	m = types.Metric{Type: types.MetricTypeMemory}
+	m = model.Metric{Type: model.MetricTypeMemory}
 	measurer, err = metric.NewMeasurer(serviceID, serviceName, m)
 	require.NoError(t, err)
 	require.IsType(t, &metric.MemoryMeasurer{}, measurer)
 
-	m = types.Metric{Type: types.MetricTypePrometheus}
+	m = model.Metric{Type: model.MetricTypePrometheus}
 	measurer, err = metric.NewMeasurer(serviceID, serviceName, m)
 	require.NoError(t, err)
 	require.IsType(t, &metric.PrometheusMeasurer{}, measurer)

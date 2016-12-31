@@ -22,12 +22,12 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	dockerTypes "github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/mtneug/pkg/startstopper"
-	"github.com/mtneug/spate/api/types"
 	"github.com/mtneug/spate/docker"
 	"github.com/mtneug/spate/metric"
+	"github.com/mtneug/spate/model"
 )
 
 // ErrNoGoals indicates that no goals were specified.
@@ -36,7 +36,7 @@ var ErrNoGoals = errors.New("autoscaler: no goals")
 // Goal consist of an observer and a target.
 type Goal struct {
 	Observer *metric.Observer
-	Target   types.Target
+	Target   model.Target
 }
 
 // Autoscaler observes one Docker Swarm service and automatically scales it
@@ -94,9 +94,9 @@ func (a *Autoscaler) run(ctx context.Context, stopChan <-chan struct{}) error {
 
 	// service created/updated cooldown
 	if a.Update {
-		a.cooldown(ctx, stopChan, types.EventTypeServiceUpdated)
+		a.cooldown(ctx, stopChan, model.EventTypeServiceUpdated)
 	} else {
-		a.cooldown(ctx, stopChan, types.EventTypeServiceCreated)
+		a.cooldown(ctx, stopChan, model.EventTypeServiceCreated)
 	}
 
 	// start autoscaling
@@ -121,17 +121,17 @@ loop:
 	return err
 }
 
-func (a *Autoscaler) cooldown(ctx context.Context, stopChan <-chan struct{}, et types.EventType) {
+func (a *Autoscaler) cooldown(ctx context.Context, stopChan <-chan struct{}, et model.EventType) {
 	// TODO: refactor to use map
 	var d time.Duration
 	switch et {
-	case types.EventTypeServiceCreated:
+	case model.EventTypeServiceCreated:
 		d = a.CooldownServiceCreated
-	case types.EventTypeServiceUpdated:
+	case model.EventTypeServiceUpdated:
 		d = a.CooldownServiceUpdated
-	case types.EventTypeServiceScaledUp:
+	case model.EventTypeServiceScaledUp:
 		d = a.CooldownServiceScaledUp
-	case types.EventTypeServiceScaledDown:
+	case model.EventTypeServiceScaledDown:
 		d = a.CooldownServiceScaledDown
 	}
 
@@ -202,7 +202,7 @@ func (a *Autoscaler) tick(ctx context.Context, stopChan <-chan struct{}) {
 		return
 	}
 
-	err = docker.C.ServiceUpdate(ctx, a.Service.ID, a.Service.Version, a.Service.Spec, dockerTypes.ServiceUpdateOptions{})
+	err = docker.C.ServiceUpdate(ctx, a.Service.ID, a.Service.Version, a.Service.Spec, types.ServiceUpdateOptions{})
 	if err != nil {
 		log.WithError(err).Warn("Service scaling failed")
 		return
@@ -220,9 +220,9 @@ func (a *Autoscaler) tick(ctx context.Context, stopChan <-chan struct{}) {
 
 	if currentScale < float64(newScale) {
 		log.Infof("Service scaled up to %d replica(s)", newScale)
-		a.cooldown(ctx, stopChan, types.EventTypeServiceScaledUp)
+		a.cooldown(ctx, stopChan, model.EventTypeServiceScaledUp)
 	} else {
 		log.Infof("Service scaled down to %d replica(s)", newScale)
-		a.cooldown(ctx, stopChan, types.EventTypeServiceScaledDown)
+		a.cooldown(ctx, stopChan, model.EventTypeServiceScaledDown)
 	}
 }

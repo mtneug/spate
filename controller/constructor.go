@@ -19,10 +19,10 @@ import (
 
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/mtneug/pkg/reducer"
-	"github.com/mtneug/spate/api/types"
 	"github.com/mtneug/spate/autoscaler"
 	"github.com/mtneug/spate/labels"
 	"github.com/mtneug/spate/metric"
+	"github.com/mtneug/spate/model"
 )
 
 var (
@@ -41,7 +41,7 @@ func constructAutoscaler(srv swarm.Service) (*autoscaler.Autoscaler, error) {
 	}
 
 	// construct objects
-	haveSeenMetric := make(map[types.Metric]bool, len(ml))
+	haveSeenMetric := make(map[model.Metric]bool, len(ml))
 	goals := make([]autoscaler.Goal, 0, len(ml))
 
 	for metricName, metricLabels := range ml {
@@ -77,7 +77,7 @@ func constructAutoscaler(srv swarm.Service) (*autoscaler.Autoscaler, error) {
 			return nil, err
 		}
 
-		target := types.Target{}
+		target := model.Target{}
 		err = labels.ParseTarget(&target, metricLabels)
 		if err != nil {
 			return nil, err

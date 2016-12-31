@@ -17,8 +17,8 @@ package labels_test
 import (
 	"testing"
 
-	"github.com/mtneug/spate/api/types"
 	"github.com/mtneug/spate/labels"
+	"github.com/mtneug/spate/model"
 	"github.com/stretchr/testify/require"
 )
 
@@ -28,7 +28,7 @@ func TestParseTarget(t *testing.T) {
 	testCases := []struct {
 		labels map[string]string
 		err    error
-		target types.Target
+		target model.Target
 	}{
 		// error
 		{
@@ -76,7 +76,7 @@ func TestParseTarget(t *testing.T) {
 		{
 			labels: map[string]string{"type": "cpu"},
 			err:    nil,
-			target: types.Target{
+			target: model.Target{
 				Value:          0.8,
 				LowerDeviation: 0,
 				UpperDeviation: 0,
@@ -89,7 +89,7 @@ func TestParseTarget(t *testing.T) {
 				"target.deviation.upper": "2%",
 			},
 			err: nil,
-			target: types.Target{
+			target: model.Target{
 				Value:          0.8,
 				LowerDeviation: 0.008,
 				UpperDeviation: 0.016,
@@ -98,7 +98,7 @@ func TestParseTarget(t *testing.T) {
 		{
 			labels: map[string]string{"type": "cpu", "target": "0.4"},
 			err:    nil,
-			target: types.Target{
+			target: model.Target{
 				Value:          0.4,
 				LowerDeviation: 0,
 				UpperDeviation: 0,
@@ -107,7 +107,7 @@ func TestParseTarget(t *testing.T) {
 		{
 			labels: map[string]string{"type": "memory"},
 			err:    nil,
-			target: types.Target{
+			target: model.Target{
 				Value:          0.8,
 				LowerDeviation: 0,
 				UpperDeviation: 0,
@@ -116,7 +116,7 @@ func TestParseTarget(t *testing.T) {
 		{
 			labels: map[string]string{"type": "memory", "target": "0.4"},
 			err:    nil,
-			target: types.Target{
+			target: model.Target{
 				Value:          0.4,
 				LowerDeviation: 0,
 				UpperDeviation: 0,
@@ -129,7 +129,7 @@ func TestParseTarget(t *testing.T) {
 				"target.deviation.upper": "2%",
 			},
 			err: nil,
-			target: types.Target{
+			target: model.Target{
 				Value:          0.8,
 				LowerDeviation: 0.008,
 				UpperDeviation: 0.016,
@@ -142,7 +142,7 @@ func TestParseTarget(t *testing.T) {
 				"target.deviation.upper": "2",
 			},
 			err: nil,
-			target: types.Target{
+			target: model.Target{
 				Value:          42,
 				LowerDeviation: 1,
 				UpperDeviation: 2,
@@ -155,7 +155,7 @@ func TestParseTarget(t *testing.T) {
 				"target.deviation.upper": "2.42",
 			},
 			err: nil,
-			target: types.Target{
+			target: model.Target{
 				Value:          -42.1234,
 				LowerDeviation: 1.42,
 				UpperDeviation: 2.42,
@@ -168,7 +168,7 @@ func TestParseTarget(t *testing.T) {
 				"target.deviation.upper": "25%",
 			},
 			err: nil,
-			target: types.Target{
+			target: model.Target{
 				Value:          42,
 				LowerDeviation: 21,
 				UpperDeviation: 10.5,
@@ -181,7 +181,7 @@ func TestParseTarget(t *testing.T) {
 				"target.deviation.upper": "25%",
 			},
 			err: nil,
-			target: types.Target{
+			target: model.Target{
 				Value:          -42.1234,
 				LowerDeviation: 21.0617,
 				UpperDeviation: 10.53085,
@@ -190,7 +190,7 @@ func TestParseTarget(t *testing.T) {
 	}
 
 	for _, c := range testCases {
-		target := types.Target{}
+		target := model.Target{}
 		err := labels.ParseTarget(&target, c.labels)
 
 		require.Equal(t, c.err, err)
