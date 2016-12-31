@@ -36,7 +36,7 @@ var ErrNoGoals = errors.New("autoscaler: no goals")
 // Goal consist of an observer and a target.
 type Goal struct {
 	Observer *metric.Observer
-	Target   model.Target
+	Target   metric.Target
 }
 
 // Autoscaler observes one Docker Swarm service and automatically scales it

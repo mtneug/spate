@@ -19,6 +19,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/mtneug/spate/metric"
 	"github.com/mtneug/spate/model"
 )
 
@@ -34,7 +35,7 @@ var (
 
 // ParseTarget parses the labels and sets the corresponding values for given
 // target.
-func ParseTarget(target *model.Target, labels map[string]string) error {
+func ParseTarget(target *metric.Target, labels map[string]string) error {
 	// value
 	var (
 		ok          bool

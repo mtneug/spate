@@ -77,7 +77,7 @@ func constructAutoscaler(srv swarm.Service) (*autoscaler.Autoscaler, error) {
 			return nil, err
 		}
 
-		target := model.Target{}
+		target := metric.Target{}
 		err = labels.ParseTarget(&target, metricLabels)
 		if err != nil {
 			return nil, err
