@@ -51,7 +51,7 @@ func TestEventLoopRun(t *testing.T) {
 		require.NoError(t, err)
 	}()
 	go func() {
-		eq <- event.Event{}
+		eq <- event.New("test_event", swarm.Service{})
 		close(done)
 	}()
 	select {
@@ -67,12 +67,7 @@ func TestHandleEventUnknownEvent(t *testing.T) {
 
 	ctx := context.Background()
 
-	e := event.Event{
-		ID:     "test",
-		Type:   "test_event",
-		Object: nil,
-	}
-
+	e := event.New("test_event", swarm.Service{})
 	m := &testutils.MockMap{}
 
 	el := newEventLoop(nil, m)
@@ -96,11 +91,7 @@ func TestHandleEventServiceCreated(t *testing.T) {
 			},
 		},
 	}
-	e := event.Event{
-		ID:     "test",
-		Type:   event.TypeServiceCreated,
-		Object: srv,
-	}
+	e := event.New(event.TypeServiceCreated, srv)
 
 	m := &testutils.MockMap{}
 	m.On("AddAndStart", ctx, "testSrv").Return(true, nil).Once()
@@ -126,11 +117,7 @@ func TestHandleEventServiceUpdated(t *testing.T) {
 			},
 		},
 	}
-	e := event.Event{
-		ID:     "test",
-		Type:   event.TypeServiceUpdated,
-		Object: srv,
-	}
+	e := event.New(event.TypeServiceUpdated, srv)
 
 	m := &testutils.MockMap{}
 	m.On("UpdateAndRestart", ctx, "testSrv").Return(true, nil).Once()
@@ -149,11 +136,7 @@ func TestHandleEventServiceDeleted(t *testing.T) {
 	srv := swarm.Service{
 		ID: "testSrv",
 	}
-	e := event.Event{
-		ID:     "test",
-		Type:   event.TypeServiceDeleted,
-		Object: srv,
-	}
+	e := event.New(event.TypeServiceDeleted, srv)
 
 	m := &testutils.MockMap{}
 	m.On("DeleteAndStop", ctx, "testSrv").Return(true, nil).Once()
