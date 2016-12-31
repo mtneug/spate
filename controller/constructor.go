@@ -60,7 +60,7 @@ func constructAutoscaler(srv swarm.Service) (*autoscaler.Autoscaler, error) {
 		haveSeenMetric[normMetric] = true
 
 		var measurer metric.Measurer
-		measurer, err = metric.NewMeasurer(srv.ID, m)
+		measurer, err = metric.NewMeasurer(srv.ID, srv.Spec.Name, m)
 		if err != nil {
 			return nil, err
 		}

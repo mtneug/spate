@@ -25,25 +25,26 @@ import (
 func TestNewMeasurer(t *testing.T) {
 	t.Parallel()
 
-	serviceID := "test_service"
+	serviceID := "bv24k4vkkdnch70zpt81ia4kz"
+	serviceName := "test_service_name"
 
 	m := types.Metric{}
-	measurer, err := metric.NewMeasurer(serviceID, m)
+	measurer, err := metric.NewMeasurer(serviceID, serviceName, m)
 	require.EqualError(t, metric.ErrUnknownType, err.Error())
 	require.Nil(t, measurer)
 
 	m = types.Metric{Type: types.MetricTypeCPU}
-	measurer, err = metric.NewMeasurer(serviceID, m)
+	measurer, err = metric.NewMeasurer(serviceID, serviceName, m)
 	require.NoError(t, err)
 	require.IsType(t, &metric.CPUMeasurer{}, measurer)
 
 	m = types.Metric{Type: types.MetricTypeMemory}
-	measurer, err = metric.NewMeasurer(serviceID, m)
+	measurer, err = metric.NewMeasurer(serviceID, serviceName, m)
 	require.NoError(t, err)
 	require.IsType(t, &metric.MemoryMeasurer{}, measurer)
 
 	m = types.Metric{Type: types.MetricTypePrometheus}
-	measurer, err = metric.NewMeasurer(serviceID, m)
+	measurer, err = metric.NewMeasurer(serviceID, serviceName, m)
 	require.NoError(t, err)
 	require.IsType(t, &metric.PrometheusMeasurer{}, measurer)
 }

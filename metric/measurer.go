@@ -19,9 +19,8 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
-	"log"
+	"net"
 	"net/http"
-	"strings"
 	"sync"
 
 	dockerTypes "github.com/docker/docker/api/types"
@@ -41,9 +40,6 @@ var (
 	// ErrUnknownType indicates that the type is unknown.
 	ErrUnknownType = errors.New("metric: unknown type")
 
-	// ErrContainerNotFound indicates that the container/s was/were not found.
-	ErrContainerNotFound = errors.New("metric: Container not found")
-
 	// ErrMetricNotFound indicates that the metric was not found.
 	ErrMetricNotFound = errors.New("metric: Metric not found")
 
@@ -57,14 +53,14 @@ type Measurer interface {
 }
 
 // NewMeasurer creates the right measurer for given metric.
-func NewMeasurer(serviceID string, metric types.Metric) (measurer Measurer, err error) {
+func NewMeasurer(serviceID, serviceName string, metric types.Metric) (measurer Measurer, err error) {
 	switch metric.Type {
 	case types.MetricTypeCPU:
-		measurer = &CPUMeasurer{ServiceID: serviceID, Metric: metric}
+		measurer = &CPUMeasurer{ServiceID: serviceID, ServiceName: serviceName, Metric: metric}
 	case types.MetricTypeMemory:
-		measurer = &MemoryMeasurer{ServiceID: serviceID, Metric: metric}
+		measurer = &MemoryMeasurer{ServiceID: serviceID, ServiceName: serviceName, Metric: metric}
 	case types.MetricTypePrometheus:
-		measurer = &PrometheusMeasurer{ServiceID: serviceID, Metric: metric}
+		measurer = &PrometheusMeasurer{ServiceID: serviceID, ServiceName: serviceName, Metric: metric}
 	default:
 		err = ErrUnknownType
 	}
@@ -73,8 +69,9 @@ func NewMeasurer(serviceID string, metric types.Metric) (measurer Measurer, err 
 
 // CPUMeasurer measures the CPU utilization.
 type CPUMeasurer struct {
-	ServiceID string
-	Metric    types.Metric
+	ServiceID   string
+	ServiceName string
+	Metric      types.Metric
 }
 
 // Measure the CPU utilization.
@@ -85,8 +82,9 @@ func (m *CPUMeasurer) Measure(ctx context.Context) (float64, error) {
 
 // MemoryMeasurer measures the memory utilization.
 type MemoryMeasurer struct {
-	ServiceID string
-	Metric    types.Metric
+	ServiceID   string
+	ServiceName string
+	Metric      types.Metric
 }
 
 // Measure the memory utilization.
@@ -97,86 +95,110 @@ func (m *MemoryMeasurer) Measure(ctx context.Context) (float64, error) {
 
 // PrometheusMeasurer measures the Prometheus metric.
 type PrometheusMeasurer struct {
-	ServiceID string
-	Metric    types.Metric
-	client    http.Client
+	ServiceID   string
+	ServiceName string
+	Metric      types.Metric
+	client      http.Client
 }
 
 // Measure the Prometheus metric.
 func (m *PrometheusMeasurer) Measure(ctx context.Context) (float64, error) {
-	args := filters.NewArgs()
-	args.Add("label", "com.docker.swarm.service.id="+m.ServiceID)
+	// Determine expected number of measurements
+	var expectedNMeasurements int
 
-	opts := dockerTypes.ContainerListOptions{Filter: args}
-	if m.Metric.Kind == types.MetricKindSystem {
-		opts.Limit = 1
+	switch m.Metric.Kind {
+	case types.MetricKindSystem:
+		expectedNMeasurements = 1
+
+	case types.MetricKindReplica:
+		args := filters.NewArgs()
+		args.Add("service", m.ServiceID)
+		args.Add("desired-state", "running")
+
+		tasks, err := docker.C.TaskList(ctx, dockerTypes.TaskListOptions{Filter: args})
+		if err != nil {
+			return 0, err
+		}
+
+		expectedNMeasurements = len(tasks)
 	}
 
-	cs, err := docker.C.ContainerList(ctx, opts)
-	if err != nil {
-		return 0, err
-	}
-	if len(cs) == 0 {
-		// TODO: system metrics might be able to continue if 'localhost' is not used.
-		return 0, ErrContainerNotFound
+	// Lookup IP addresses to replace localhost
+	var addrs []string
+	if m.Metric.Prometheus.Endpoint.Host == "localhost" {
+		// We use Swarm mode service discovery to get the IPs of all containers.
+		// See https://docs.docker.com/engine/swarm/networking/#/use-swarm-mode-service-discovery
+		var err error
+		addrs, err = net.LookupHost("tasks." + m.ServiceName)
+		if err != nil {
+			return 0, err
+		}
+
+		if len(addrs) < expectedNMeasurements {
+			// TODO: should probably tell the user about it, but this package should
+			//       not depend on logrus.
+			expectedNMeasurements = len(addrs)
+		}
 	}
 
+	// Measure
 	wg := &sync.WaitGroup{}
 	mutex := &sync.Mutex{}
-	measures := make([]float64, 0, len(cs))
+	measures := make([]float64, 0, len(addrs))
 
-	measure := func(c dockerTypes.Container) {
-		defer wg.Done()
-		for _, n := range c.NetworkSettings.Networks {
+	for _i := 0; _i < expectedNMeasurements; _i++ {
+		i := _i
+
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+
 			url := m.Metric.Prometheus.Endpoint
-			url.Host = strings.Replace(url.Host, "localhost", n.IPAddress, 1)
+			if url.Host == "localhost" {
+				url.Host = addrs[i]
+			}
 
 			req, err2 := http.NewRequest("GET", url.String(), nil)
 			if err2 != nil {
-				continue
+				return
 			}
 
 			resp, err2 := m.client.Do(req.WithContext(ctx))
 			if err2 != nil {
-				continue
+				return
 			}
 			defer drainAndCloseReader(resp.Body)
 
 			sample, err2 := decodeAndFindPrometheusSample(resp.Body, m.Metric.Prometheus.Name)
 			if err2 != nil {
-				continue
+				return
 			}
 
 			mutex.Lock()
 			measures = append(measures, float64(sample.Value))
 			mutex.Unlock()
-			break
-		}
+		}()
 	}
-
-	for _, c := range cs {
-		if c.NetworkSettings != nil {
-			wg.Add(1)
-			go measure(c)
-		}
-	}
-
 	wg.Wait()
 
-	if len(measures) < len(cs) {
-		if float64(len(measures)) < float64(len(cs))*CriticalFailurePercentage {
+	// Correct missing measurements
+	if len(measures) < expectedNMeasurements {
+		if float64(len(measures)) < float64(expectedNMeasurements)*CriticalFailurePercentage {
 			return 0, ErrTooManyFailedMeasurements
 		}
 
-		var avg float64
-		skipped := float64(len(cs) - len(measures))
-		avg, err = reducer.Avg().Reduce(measures)
+		// TODO: should probably tell the user about it, but this package should
+		//       not depend on logrus.
+
+		skipped := float64(expectedNMeasurements - len(measures))
+		avg, err := reducer.Avg().Reduce(measures)
 		if err != nil {
 			return 0, err
 		}
 		measures = append(measures, skipped*avg)
 	}
 
+	// Aggregate
 	sum, err := reducer.Sum().Reduce(measures)
 	if err != nil {
 		return 0, err
@@ -199,7 +221,6 @@ func decodeAndFindPrometheusSample(r io.Reader, metricName string) (*model.Sampl
 			if err == io.EOF {
 				break
 			}
-			log.Println(err)
 			continue
 		}
 
