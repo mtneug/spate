@@ -58,28 +58,26 @@ func (el *eventLoop) run(ctx context.Context, stopChan <-chan struct{}) error {
 func (el *eventLoop) handleEvent(ctx context.Context, e event.Event) {
 	log.Debugf("Received %s event", e.Type)
 
-	srv := e.Object.(swarm.Service)
-
 	var changed bool
 	var err error
 
 	switch e.Type {
 	case event.TypeServiceCreated:
-		changed, err = el.addAutoscaler(ctx, srv)
+		changed, err = el.addAutoscaler(ctx, e.Service)
 		if err != nil {
 			log.WithError(err).Error("Could not add autoscaler")
 		} else {
 			log.Info("Autoscaler added")
 		}
 	case event.TypeServiceUpdated:
-		changed, err = el.updateAutoscaler(ctx, srv)
+		changed, err = el.updateAutoscaler(ctx, e.Service)
 		if err != nil {
 			log.WithError(err).Error("Could not update autoscaler")
 		} else {
 			log.Info("Autoscaler updated")
 		}
 	case event.TypeServiceDeleted:
-		changed, err = el.deleteAutoscaler(ctx, srv)
+		changed, err = el.deleteAutoscaler(ctx, e.Service)
 		if err != nil {
 			log.WithError(err).Error("Could not delete autoscaler")
 		} else {

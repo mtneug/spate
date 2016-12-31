@@ -14,7 +14,10 @@
 
 package event
 
-import "github.com/mtneug/pkg/ulid"
+import (
+	"github.com/docker/docker/api/types/swarm"
+	"github.com/mtneug/pkg/ulid"
+)
 
 // Type represents some category of events.
 type Type string
@@ -38,15 +41,15 @@ type Event struct {
 	ID string
 	// Type of the event.
 	Type Type
-	// Object relevant to the event.
-	Object interface{}
+	// Service relevant to the event.
+	Service swarm.Service
 }
 
 // New creates a new event.
-func New(t Type, obj interface{}) Event {
+func New(t Type, srv swarm.Service) Event {
 	return Event{
-		ID:     ulid.New().String(),
-		Type:   t,
-		Object: obj,
+		ID:      ulid.New().String(),
+		Type:    t,
+		Service: srv,
 	}
 }
