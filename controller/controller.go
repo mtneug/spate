@@ -34,7 +34,7 @@ type Controller struct {
 }
 
 // New creates a new controller.
-func New(p time.Duration) (*Controller, error) {
+func New(p time.Duration) *Controller {
 	m := startstopper.NewInMemoryMap()
 	eq := make(chan event.Event, 20)
 	ctrl := &Controller{
@@ -45,7 +45,7 @@ func New(p time.Duration) (*Controller, error) {
 	}
 	ctrl.StartStopper = startstopper.NewGo(startstopper.RunnerFunc(ctrl.run))
 
-	return ctrl, nil
+	return ctrl
 }
 
 func (c *Controller) run(ctx context.Context, stopChan <-chan struct{}) error {

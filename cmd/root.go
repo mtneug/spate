@@ -109,15 +109,8 @@ var rootCmd = &cobra.Command{
 		}
 
 		// API server and Controller
-		server, err := api.New(addr)
-		if err != nil {
-			return err
-		}
-
-		ctrl, err := controller.New(ctrlPeriod)
-		if err != nil {
-			return err
-		}
+		server := api.New(addr)
+		ctrl := controller.New(ctrlPeriod)
 
 		group := startstopper.NewGroup([]startstopper.StartStopper{
 			server,

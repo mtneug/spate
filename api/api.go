@@ -33,7 +33,7 @@ type Server struct {
 }
 
 // New creates a new server.
-func New(addr string) (*Server, error) {
+func New(addr string) *Server {
 	mux := http.NewServeMux()
 	mux.Handle("/metrics", prometheus.Handler())
 
@@ -48,7 +48,7 @@ func New(addr string) (*Server, error) {
 	}
 	s.StartStopper = startstopper.NewGo(startstopper.RunnerFunc(s.run))
 
-	return s, nil
+	return s
 }
 
 func (s *Server) run(ctx context.Context, stopChan <-chan struct{}) error {
