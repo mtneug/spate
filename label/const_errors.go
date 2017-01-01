@@ -19,62 +19,62 @@ import "errors"
 var (
 	// ErrInvalidMetricLabel indicates that the parsing failed because the metric
 	// label is invalid.
-	ErrInvalidMetricLabel = errors.New("labels: metric label invalid")
+	ErrInvalidMetricLabel = errors.New("label: metric label invalid")
 
 	// ErrDuplicateMetric indicates that at least two metrics are the same.
-	ErrDuplicateMetric = errors.New("labels: duplicate metric")
+	ErrDuplicateMetric = errors.New("label: duplicate metric")
 
 	// ErrNoType indicates that the parsing failed because no type was specified.
-	ErrNoType = errors.New("labels: no type specified")
+	ErrNoType = errors.New("label: no type specified")
 
 	// ErrUnknownType indicates that the parsing failed because the type is
 	// unknown.
-	ErrUnknownType = errors.New("labels: unknown type")
+	ErrUnknownType = errors.New("label: unknown type")
 
 	// ErrNoKind indicates that the parsing failed because no kind was specified.
-	ErrNoKind = errors.New("labels: no kind specified")
+	ErrNoKind = errors.New("label: no kind specified")
 
 	// ErrUnknownKind indicates that the parsing failed because the kind is
 	// unknown.
-	ErrUnknownKind = errors.New("labels: unknown kind")
+	ErrUnknownKind = errors.New("label: unknown kind")
 
 	// ErrWrongKind indicates that the parsing failed because a wrong kind was
 	// used for the metric.
-	ErrWrongKind = errors.New("labels: wrong kind")
+	ErrWrongKind = errors.New("label: wrong kind")
 
 	// ErrNoPrometheusEndpoint indicates that the parsing failed because no
 	// Prometheus endpoint was specified.
-	ErrNoPrometheusEndpoint = errors.New("labels: no Prometheus endpoint specified")
+	ErrNoPrometheusEndpoint = errors.New("label: no Prometheus endpoint specified")
 
 	// ErrInvalidHTTPUrl indicates that the parsing failed because the specified
 	// URL is an invalid HTTP URL.
-	ErrInvalidHTTPUrl = errors.New("labels: invalid HTTP URL")
+	ErrInvalidHTTPUrl = errors.New("label: invalid HTTP URL")
 
 	// ErrNoPrometheusMetricName indicates that the parsing failed because no
 	// Prometheus metric name was specified.
-	ErrNoPrometheusMetricName = errors.New("labels: no Prometheus metric name specified")
+	ErrNoPrometheusMetricName = errors.New("label: no Prometheus metric name specified")
 
 	// ErrUnknownAggregationMethod indicates that the parsing failed because the
 	// aggregation method is unknown.
-	ErrUnknownAggregationMethod = errors.New("labels: aggregation method is unknown")
+	ErrUnknownAggregationMethod = errors.New("label: aggregation method is unknown")
 
 	// ErrNoValue indicates that the parsing failed because no value was
 	// specified.
-	ErrNoValue = errors.New("labels: no value specified")
+	ErrNoValue = errors.New("label: no value specified")
 
 	// ErrInvalidFloat indicates that the parsing failed because the float is
 	// invalid.
-	ErrInvalidFloat = errors.New("labels: invalid float")
+	ErrInvalidFloat = errors.New("label: invalid float")
 
 	// ErrInvalidDeviation indicates that the parsing failed because the deviation
 	// is invalid.
-	ErrInvalidDeviation = errors.New("labels: invalid deviation")
+	ErrInvalidDeviation = errors.New("label: invalid deviation")
 
 	// ErrInvalidDuration indicates that the parsing failed because the duration
 	// is invalid.
-	ErrInvalidDuration = errors.New("labels: invalid duration")
+	ErrInvalidDuration = errors.New("label: invalid duration")
 
 	// ErrInvalidUint indicates that the parsing failed because the uint is
 	// invalid.
-	ErrInvalidUint = errors.New("labels: invalid uint")
+	ErrInvalidUint = errors.New("label: invalid uint")
 )
