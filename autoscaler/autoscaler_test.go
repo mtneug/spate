@@ -22,8 +22,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TODO:
-
 func TestNew(t *testing.T) {
 	srv := swarm.Service{}
 
