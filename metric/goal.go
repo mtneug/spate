@@ -12,27 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package autoscaler_test
+package metric
 
-import (
-	"testing"
-
-	"github.com/docker/docker/api/types/swarm"
-	"github.com/mtneug/spate/autoscaler"
-	"github.com/mtneug/spate/metric"
-	"github.com/stretchr/testify/require"
-)
-
-func TestNew(t *testing.T) {
-	srv := swarm.Service{}
-
-	goals := make([]metric.Goal, 0)
-	_, err := autoscaler.New(srv, goals)
-	require.EqualError(t, err, autoscaler.ErrNoGoals.Error())
-
-	goals = make([]metric.Goal, 1)
-	a, err := autoscaler.New(srv, goals)
-	require.NoError(t, err)
-	require.Equal(t, srv, a.Service)
-	require.Equal(t, goals, a.Goals)
+// Goal consist of an observer and a target.
+type Goal struct {
+	Observer *Observer
+	Target   Target
 }

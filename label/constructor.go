@@ -34,7 +34,7 @@ func ConstructAutoscaler(srv swarm.Service) (*autoscaler.Autoscaler, error) {
 
 	// construct objects
 	haveSeenMetric := make(map[metric.Metric]bool, len(ml))
-	goals := make([]autoscaler.Goal, 0, len(ml))
+	goals := make([]metric.Goal, 0, len(ml))
 
 	for metricName, metricLabels := range ml {
 		m := metric.New(metricName)
@@ -75,7 +75,7 @@ func ConstructAutoscaler(srv swarm.Service) (*autoscaler.Autoscaler, error) {
 			return nil, err
 		}
 
-		goals = append(goals, autoscaler.Goal{Observer: observer, Target: target})
+		goals = append(goals, metric.Goal{Observer: observer, Target: target})
 	}
 
 	a, err := autoscaler.New(srv, goals)

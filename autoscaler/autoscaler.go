@@ -33,12 +33,6 @@ import (
 // ErrNoGoals indicates that no goals were specified.
 var ErrNoGoals = errors.New("autoscaler: no goals")
 
-// Goal consist of an observer and a target.
-type Goal struct {
-	Observer *metric.Observer
-	Target   metric.Target
-}
-
 // Autoscaler observes one Docker Swarm service and automatically scales it
 // depending on defined metrics.
 type Autoscaler struct {
@@ -47,7 +41,7 @@ type Autoscaler struct {
 
 	Service swarm.Service
 	Update  bool
-	Goals   []Goal
+	Goals   []metric.Goal
 
 	Period                    time.Duration
 	CooldownServiceCreated    time.Duration
@@ -60,7 +54,7 @@ type Autoscaler struct {
 }
 
 // New creates an autoscaler for the given service.
-func New(srv swarm.Service, goals []Goal) (*Autoscaler, error) {
+func New(srv swarm.Service, goals []metric.Goal) (*Autoscaler, error) {
 	if len(goals) == 0 {
 		return nil, ErrNoGoals
 	}
