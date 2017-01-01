@@ -25,4 +25,4 @@
 
 ## License
 
-Apache 2.0 © Matthias Neugebauer
+Apache 2.0 (c) Matthias Neugebauer
