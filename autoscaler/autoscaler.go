@@ -74,7 +74,6 @@ func (a *Autoscaler) run(ctx context.Context, stopChan <-chan struct{}) error {
 	var err error
 
 	// start observer
-	// TODO: Change data structues so that this allocation is unnecessary
 	observer := make([]startstopper.StartStopper, len(a.Goals))
 	for i, goal := range a.Goals {
 		observer[i] = goal.Observer
