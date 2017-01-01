@@ -71,8 +71,6 @@ func (a *Autoscaler) run(ctx context.Context, stopChan <-chan struct{}) error {
 	log.Debug("Autoscaler loop started")
 	defer log.Debug("Autoscaler loop stopped")
 
-	var err error
-
 	// start observer
 	observer := make([]startstopper.StartStopper, len(a.Goals))
 	for i, goal := range a.Goals {
@@ -80,7 +78,7 @@ func (a *Autoscaler) run(ctx context.Context, stopChan <-chan struct{}) error {
 	}
 	observerGroup := startstopper.NewGroup(observer)
 
-	err = observerGroup.Start(ctx)
+	err := observerGroup.Start(ctx)
 	if err != nil {
 		return err
 	}
@@ -111,7 +109,7 @@ loop:
 		return err
 	}
 
-	return err
+	return nil
 }
 
 func (a *Autoscaler) cooldown(ctx context.Context, stopChan <-chan struct{}, et event.Type) {
@@ -129,13 +127,13 @@ func (a *Autoscaler) cooldown(ctx context.Context, stopChan <-chan struct{}, et 
 	}
 
 	if d > 0 {
-		log.Debug("Autoscaler cooldown after '" + et + "' started")
+		log.Debugf("Autoscaler cooldown after '%s' started", et)
 		select {
 		case <-time.After(d):
 		case <-stopChan:
 		case <-ctx.Done():
 		}
-		log.Debug("Autoscaler cooldown after '" + et + "' stopped")
+		log.Debugf("Autoscaler cooldown after '%s' stopped", et)
 	}
 }
 
@@ -160,8 +158,8 @@ func (a *Autoscaler) tick(ctx context.Context, stopChan <-chan struct{}) {
 
 	srvMode := a.Service.Spec.Mode
 	if srvMode.Replicated == nil || srvMode.Replicated.Replicas == nil {
-		// TODO: check this beforehand
-		log.Warn("Service is not a replicated service")
+		// TODO: also check this beforehand
+		log.Error("Service is not a replicated service")
 		return
 	}
 
