@@ -36,10 +36,15 @@ type Server struct {
 func New(addr string) (*Server, error) {
 	mux := http.NewServeMux()
 	mux.Handle("/metrics", prometheus.Handler())
-	// TODO: connect ErrorLog to logrus
+
+	loggedMux := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Debugf("%s \"%s %s %s\"", r.RemoteAddr, r.Method, r.URL, r.Proto)
+		mux.ServeHTTP(w, r)
+	})
+
 	s := &Server{
 		Addr:   addr,
-		server: &http.Server{Handler: mux},
+		server: &http.Server{Handler: loggedMux},
 	}
 	s.StartStopper = startstopper.NewGo(startstopper.RunnerFunc(s.run))
 
