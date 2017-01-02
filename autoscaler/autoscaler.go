@@ -176,12 +176,13 @@ func (a *Autoscaler) tick(ctx context.Context, stopChan <-chan struct{}) {
 		// deviation acceptable?
 		deviation := (ag / currentScale) - goal.Target.Value
 		log.Debugf("Deviation from target is %f", deviation)
-		if -goal.Target.LowerDeviation <= deviation && deviation <= goal.Target.UpperDeviation {
-			break
-		}
 
-		// update desired scale
-		desiredScale = math.Max(desiredScale, math.Ceil(ag/goal.Target.Value))
+		// update desiredscale
+		if -goal.Target.LowerDeviation <= deviation && deviation <= goal.Target.UpperDeviation {
+			desiredScale = math.Max(desiredScale, currentScale)
+		} else {
+			desiredScale = math.Max(desiredScale, math.Ceil(ag/goal.Target.Value))
+		}
 	}
 
 	newScale := uint64(math.Min(desiredScale, float64(a.MaxReplicas)))
