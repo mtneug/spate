@@ -28,9 +28,8 @@ func TestNew(t *testing.T) {
 
 	p := time.Second
 
-	ctrl, err := New(p)
+	ctrl := New(p)
 	require.NotNil(t, ctrl)
-	require.NoError(t, err)
 
 	require.IsType(t, &eventLoop{}, ctrl.eventLoop)
 
@@ -50,7 +49,7 @@ func TestController(t *testing.T) {
 	eventLoop.On("Start", ctx).Return(nil).Once()
 	eventLoop.On("Stop", ctx).Return(nil).Once()
 
-	ctrl, _ := New(time.Second)
+	ctrl := New(time.Second)
 	ctrl.changeLoop = changeLoop
 	ctrl.eventLoop = eventLoop
 
