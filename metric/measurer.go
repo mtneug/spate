@@ -114,7 +114,7 @@ func (m *PrometheusMeasurer) Measure(ctx context.Context) (float64, error) {
 		args.Add("service", m.ServiceID)
 		args.Add("desired-state", "running")
 
-		tasks, err := docker.C.TaskList(ctx, types.TaskListOptions{Filter: args})
+		tasks, err := docker.C.TaskList(ctx, types.TaskListOptions{Filters: args})
 		if err != nil {
 			return 0, err
 		}

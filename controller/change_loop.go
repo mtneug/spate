@@ -35,7 +35,7 @@ var serviceListOptions types.ServiceListOptions
 func init() {
 	f := filters.NewArgs()
 	f.Add("label", fmt.Sprintf("%s=%s", labelSpate, "enable"))
-	serviceListOptions = types.ServiceListOptions{Filter: f}
+	serviceListOptions = types.ServiceListOptions{Filters: f}
 }
 
 type changeLoop struct {

@@ -194,7 +194,8 @@ func (a *Autoscaler) tick(ctx context.Context, stopChan <-chan struct{}) {
 		return
 	}
 
-	err = docker.C.ServiceUpdate(ctx, a.Service.ID, a.Service.Version, a.Service.Spec, types.ServiceUpdateOptions{})
+	// TODO: check returned warnings in types.ServiceUpdateResponse
+	_, err = docker.C.ServiceUpdate(ctx, a.Service.ID, a.Service.Version, a.Service.Spec, types.ServiceUpdateOptions{})
 	if err != nil {
 		log.WithError(err).Warn("Service scaling failed")
 		return
