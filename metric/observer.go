@@ -28,9 +28,9 @@ import (
 type Observer struct {
 	startstopper.StartStopper
 
-	measures []float64
-	i        uint8
-	mutex    sync.RWMutex
+	measurements []float64
+	i            uint8
+	mutex        sync.RWMutex
 
 	Measurer          Measurer
 	Reducer           reducer.Reducer
@@ -53,7 +53,7 @@ func (o *Observer) run(ctx context.Context, stopChan <-chan struct{}) error {
 	log.Debug("Observer loop started")
 	defer log.Debug("Observer loop stopped")
 
-	o.measures = make([]float64, 0, o.AggregationAmount)
+	o.measurements = make([]float64, 0, o.AggregationAmount)
 
 	o.tick(ctx)
 	for {
@@ -68,12 +68,12 @@ func (o *Observer) run(ctx context.Context, stopChan <-chan struct{}) error {
 	}
 }
 
-// AggregatedMeasure of current measurements.
-func (o *Observer) AggregatedMeasure() (float64, error) {
+// AggregatedMetric of current measurements.
+func (o *Observer) AggregatedMetric() (float64, error) {
 	o.mutex.RLock()
 	defer o.mutex.RUnlock()
 
-	return o.Reducer.Reduce(o.measures)
+	return o.Reducer.Reduce(o.measurements)
 }
 
 func (o *Observer) tick(ctx context.Context) {
@@ -88,10 +88,10 @@ func (o *Observer) tick(ctx context.Context) {
 
 	log.Debugf("Measured %f", measure)
 
-	if len(o.measures) < int(o.AggregationAmount) {
-		o.measures = append(o.measures, measure)
+	if len(o.measurements) < int(o.AggregationAmount) {
+		o.measurements = append(o.measurements, measure)
 	} else {
-		o.measures[o.i] = measure
+		o.measurements[o.i] = measure
 		o.i = (o.i + 1) % o.AggregationAmount
 	}
 }

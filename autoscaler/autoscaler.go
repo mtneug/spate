@@ -167,7 +167,7 @@ func (a *Autoscaler) tick(ctx context.Context, stopChan <-chan struct{}) {
 	desiredScale := float64(a.MinReplicas)
 
 	for _, goal := range a.Goals {
-		ag, err = goal.Observer.AggregatedMeasure()
+		ag, err = goal.Observer.AggregatedMetric()
 		if err != nil {
 			log.WithError(err).Warn("Measure aggregation failed")
 			return
