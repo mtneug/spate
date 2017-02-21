@@ -46,13 +46,13 @@ const (
 	// autoscaler cooldown time after a ServiceUpdated.
 	AutoscalerCooldownServiceUpdated = "autoscaler.cooldown.service_updated"
 
-	// ReplicasMin is the suffix (after spate namespace) for the minimum number of
+	// ReplicaMin is the suffix (after spate namespace) for the minimum number of
 	// replicas.
-	ReplicasMin = "replicas.min"
+	ReplicaMin = "replica.min"
 
-	// ReplicasMax is the suffix (after spate namespace) for the maximum number of
+	// ReplicaMax is the suffix (after spate namespace) for the maximum number of
 	// replicas.
-	ReplicasMax = "replicas.max"
+	ReplicaMax = "replica.max"
 
 	//
 	// Metric

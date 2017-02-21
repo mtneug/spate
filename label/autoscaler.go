@@ -103,7 +103,7 @@ func ParseAutoscaler(a *autoscaler.Autoscaler, labels map[string]string) error {
 	}
 
 	// min replicas
-	replicasMinStr, ok := labels[ReplicasMin]
+	replicasMinStr, ok := labels[ReplicaMin]
 	if !ok {
 		a.MinReplicas = 1
 	} else {
@@ -115,7 +115,7 @@ func ParseAutoscaler(a *autoscaler.Autoscaler, labels map[string]string) error {
 	}
 
 	// max replicas
-	replicasMaxStr, ok := labels[ReplicasMax]
+	replicasMaxStr, ok := labels[ReplicaMax]
 	if !ok {
 		a.MaxReplicas = math.MaxUint64
 	} else {
