@@ -53,11 +53,11 @@ func TestParseAutoscaler(t *testing.T) {
 			err:    label.ErrInvalidDuration,
 		},
 		{
-			labels: map[string]string{"replicas.min": "abc"},
+			labels: map[string]string{"replica.min": "abc"},
 			err:    label.ErrInvalidUint,
 		},
 		{
-			labels: map[string]string{"replicas.max": "abc"},
+			labels: map[string]string{"replica.max": "abc"},
 			err:    label.ErrInvalidUint,
 		},
 		{
@@ -80,8 +80,8 @@ func TestParseAutoscaler(t *testing.T) {
 				"autoscaler.cooldown.scaled_down":     "3m",
 				"autoscaler.cooldown.service_added":   "4m",
 				"autoscaler.cooldown.service_updated": "5m",
-				"replicas.min":                        "6",
-				"replicas.max":                        "7",
+				"replica.min":                         "6",
+				"replica.max":                         "7",
 			},
 			err: nil,
 			autoscaler: autoscaler.Autoscaler{
