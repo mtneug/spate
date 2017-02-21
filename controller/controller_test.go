@@ -33,25 +33,25 @@ func TestNew(t *testing.T) {
 
 	require.IsType(t, &eventLoop{}, ctrl.eventLoop)
 
-	require.IsType(t, &changeLoop{}, ctrl.changeLoop)
-	cl := ctrl.changeLoop.(*changeLoop)
+	require.IsType(t, &serviceEventPublisher{}, ctrl.serviceEventPublisher)
+	cl := ctrl.serviceEventPublisher.(*serviceEventPublisher)
 	require.Equal(t, p, cl.period)
 }
 
 func TestController(t *testing.T) {
 	ctx := context.Background()
 
-	changeLoop := &testutils.MockStartStopper{}
-	changeLoop.On("Start", ctx).Return(nil).Once()
-	changeLoop.On("Stop", ctx).Return(nil).Once()
+	sep := &testutils.MockStartStopper{}
+	sep.On("Start", ctx).Return(nil).Once()
+	sep.On("Stop", ctx).Return(nil).Once()
 
-	eventLoop := &testutils.MockStartStopper{}
-	eventLoop.On("Start", ctx).Return(nil).Once()
-	eventLoop.On("Stop", ctx).Return(nil).Once()
+	el := &testutils.MockStartStopper{}
+	el.On("Start", ctx).Return(nil).Once()
+	el.On("Stop", ctx).Return(nil).Once()
 
 	ctrl := New(time.Second)
-	ctrl.changeLoop = changeLoop
-	ctrl.eventLoop = eventLoop
+	ctrl.serviceEventPublisher = sep
+	ctrl.eventLoop = el
 
 	err := ctrl.Start(ctx)
 	require.NoError(t, err)
@@ -68,6 +68,6 @@ func TestController(t *testing.T) {
 	err = ctrl.Err(ctx)
 	require.NoError(t, err)
 
-	changeLoop.AssertExpectations(t)
-	eventLoop.AssertExpectations(t)
+	sep.AssertExpectations(t)
+	el.AssertExpectations(t)
 }

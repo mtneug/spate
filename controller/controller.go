@@ -27,10 +27,10 @@ import (
 type Controller struct {
 	startstopper.StartStopper
 
-	autoscalers startstopper.Map
-	eventQueue  chan event.Event
-	eventLoop   startstopper.StartStopper
-	changeLoop  startstopper.StartStopper
+	autoscalers           startstopper.Map
+	eventQueue            chan event.Event
+	eventLoop             startstopper.StartStopper
+	serviceEventPublisher startstopper.StartStopper
 }
 
 // New creates a new controller.
@@ -38,10 +38,10 @@ func New(p time.Duration) *Controller {
 	m := startstopper.NewInMemoryMap()
 	eq := make(chan event.Event, 20)
 	ctrl := &Controller{
-		autoscalers: m,
-		eventQueue:  eq,
-		eventLoop:   newEventLoop(eq, m),
-		changeLoop:  newChangeLoop(p, eq, m),
+		autoscalers:           m,
+		eventQueue:            eq,
+		eventLoop:             newEventLoop(eq, m),
+		serviceEventPublisher: newServiceEventPublisher(p, eq, m),
 	}
 	ctrl.StartStopper = startstopper.NewGo(startstopper.RunnerFunc(ctrl.run))
 
@@ -53,7 +53,7 @@ func (c *Controller) run(ctx context.Context, stopChan <-chan struct{}) error {
 	defer log.Debug("Controller loop stopped")
 
 	group := startstopper.NewGroup([]startstopper.StartStopper{
-		c.changeLoop,
+		c.serviceEventPublisher,
 		c.eventLoop,
 	})
 

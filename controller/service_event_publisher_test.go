@@ -23,12 +23,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestChangeLoopRun(t *testing.T) {
+func TestServiceEventPublisherRun(t *testing.T) {
 	t.Parallel()
 	t.Skip("Refactor so that the Docker Client can be mocked")
 
 	eq := make(chan event.Event)
-	cl := newChangeLoop(time.Second, eq, nil)
+	cl := newServiceEventPublisher(time.Second, eq, nil)
 
 	// stopChan
 	stopChan := make(chan struct{})

@@ -38,7 +38,7 @@ func init() {
 	serviceListOptions = types.ServiceListOptions{Filters: f}
 }
 
-type changeLoop struct {
+type serviceEventPublisher struct {
 	startstopper.StartStopper
 
 	period         time.Duration
@@ -49,26 +49,26 @@ type changeLoop struct {
 	seen map[string]bool
 }
 
-func newChangeLoop(p time.Duration, eq chan<- event.Event, m startstopper.Map) *changeLoop {
-	cl := &changeLoop{
+func newServiceEventPublisher(p time.Duration, eq chan<- event.Event, m startstopper.Map) *serviceEventPublisher {
+	sep := &serviceEventPublisher{
 		period:         p,
 		eventQueue:     eq,
 		autoscalersMap: m,
 		seen:           make(map[string]bool),
 	}
-	cl.StartStopper = startstopper.NewGo(startstopper.RunnerFunc(cl.run))
-	return cl
+	sep.StartStopper = startstopper.NewGo(startstopper.RunnerFunc(sep.run))
+	return sep
 }
 
-func (cl *changeLoop) run(ctx context.Context, stopChan <-chan struct{}) error {
-	log.Debug("Change detection loop started")
-	defer log.Debug("Change detection loop stopped")
+func (sep *serviceEventPublisher) run(ctx context.Context, stopChan <-chan struct{}) error {
+	log.Debug("Service event publisher started")
+	defer log.Debug("Service event publisher stopped")
 
-	cl.tick(ctx)
+	sep.tick(ctx)
 	for {
 		select {
-		case <-time.After(cl.period):
-			cl.tick(ctx)
+		case <-time.After(sep.period):
+			sep.tick(ctx)
 		case <-stopChan:
 			return nil
 		case <-ctx.Done():
@@ -77,7 +77,7 @@ func (cl *changeLoop) run(ctx context.Context, stopChan <-chan struct{}) error {
 	}
 }
 
-func (cl *changeLoop) tick(ctx context.Context) {
+func (sep *serviceEventPublisher) tick(ctx context.Context) {
 	services, err := docker.C.ServiceList(ctx, serviceListOptions)
 	if err != nil {
 		log.WithError(err).Error("Failed to get list of services")
@@ -85,31 +85,31 @@ func (cl *changeLoop) tick(ctx context.Context) {
 	}
 
 	for _, srv := range services {
-		cl.seen[srv.ID] = true
+		sep.seen[srv.ID] = true
 
-		ss, present := cl.autoscalersMap.Get(srv.ID)
+		ss, present := sep.autoscalersMap.Get(srv.ID)
 		if !present {
 			// Add
-			cl.eventQueue <- event.New(event.TypeServiceCreated, srv)
+			sep.eventQueue <- event.New(event.TypeServiceCreated, srv)
 		} else {
 			a := ss.(*autoscaler.Autoscaler)
 			a.RLock()
 			if a.Service.Version.Index < srv.Version.Index {
 				// Update
-				cl.eventQueue <- event.New(event.TypeServiceUpdated, srv)
+				sep.eventQueue <- event.New(event.TypeServiceUpdated, srv)
 			}
 			a.RUnlock()
 		}
 	}
 
-	cl.autoscalersMap.ForEach(func(id string, ss startstopper.StartStopper) {
-		if !cl.seen[id] {
+	sep.autoscalersMap.ForEach(func(id string, ss startstopper.StartStopper) {
+		if !sep.seen[id] {
 			// Delete
 			a := ss.(*autoscaler.Autoscaler)
 			a.RLock()
-			cl.eventQueue <- event.New(event.TypeServiceDeleted, a.Service)
+			sep.eventQueue <- event.New(event.TypeServiceDeleted, a.Service)
 			a.RUnlock()
 		}
-		delete(cl.seen, id)
+		delete(sep.seen, id)
 	})
 }
