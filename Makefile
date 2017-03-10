@@ -50,15 +50,15 @@ all: lint build test integration
 ci: lint-full build coverage coverage-integration
 
 build:
-	@echo "🌊 $@"
+	@echo "🌊  $@"
 	@go build $(GO_BUILD_ARGS) -o bin/spate $(PKG)
 
 install:
-	@echo "🌊 $@"
+	@echo "🌊  $@"
 	@go install $(GO_BUILD_ARGS) $(PKG)
 
 run: build
-	@echo "🌊 $@"
+	@echo "🌊  $@"
 	@bin/spate \
 		--log-level debug \
 		--controller-period 1s \
@@ -70,15 +70,15 @@ run: build
 		--default-cooldown-service_updated 2s
 
 clean:
-	@echo "🌊 $@"
+	@echo "🌊  $@"
 	@rm -f bin
 
 lint:
-	@echo "🌊 $@"
+	@echo "🌊  $@"
 	@test -z "$$(gometalinter --deadline=5s ${GOMETALINTER_COMMON_ARGS} ./... | tee /dev/stderr)"
 
 lint-full:
-	@echo "🌊 $@"
+	@echo "🌊  $@"
 	@test -z "$$(gometalinter --deadline=5m ${GOMETALINTER_COMMON_ARGS} \
 			--enable=deadcode \
 			--enable=varcheck \
@@ -89,15 +89,15 @@ lint-full:
 		tee /dev/stderr)"
 
 test:
-	@echo "🌊 $@"
+	@echo "🌊  $@"
 	@go test -parallel 8 -race $(filter-out ${PKG_INTEGRATION},${PKGS})
 
 integration:
-	@echo "🌊 $@"
+	@echo "🌊  $@"
 	@go test -parallel 8 -race ${PKG_INTEGRATION}
 
 coverage:
-	@echo "🌊 $@"
+	@echo "🌊  $@"
 	@status=0; \
 	for pkg in $(filter-out ${PKG_INTEGRATION},${PKGS}); do \
 		go test -race -coverprofile="../../../$$pkg/coverage.txt" -covermode=atomic $$pkg; \
@@ -106,7 +106,7 @@ coverage:
 	exit $$status
 
 coverage-integration:
-	@echo "🌊 $@"
+	@echo "🌊  $@"
 	@go test -race -coverprofile="../../../${PKG_INTEGRATION}/coverage.txt" -covermode=atomic ${PKG_INTEGRATION}
 
 .PHONY: all ci build install clean lint lint-full test integration coverage coverage-integration
