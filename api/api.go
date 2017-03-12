@@ -60,17 +60,23 @@ func (s *Server) run(ctx context.Context, stopChan <-chan struct{}) error {
 		return err
 	}
 
-	errChan := make(chan error)
-	go func() { errChan <- s.server.Serve(ln) }()
+	doneChan := make(chan struct{})
+	go func() {
+		err = s.server.Serve(ln)
+		close(doneChan)
+	}()
 
 	select {
-	case err = <-errChan:
-		return err
+	case <-doneChan:
 	case <-stopChan:
 	case <-ctx.Done():
 	}
 
-	// TODO: actually stop the server
+	_ = s.server.Shutdown(ctx)
 
-	return nil
+	if err == http.ErrServerClosed {
+		return nil
+	}
+
+	return err
 }
