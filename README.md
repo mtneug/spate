@@ -13,7 +13,7 @@
 > 2.  a) a large number or amount<br>
 >     b) a sudden or strong outburst rush
 >
-> — Merriam-Webster's Learner's Dictionary
+> — [Merriam-Webster Dictionary](https://www.merriam-webster.com/dictionary/spate)
 
 `spate` is a horizontal service autoscaler for [Docker Swarm mode](https://docs.docker.com/engine/swarm/) inspired by Kubernetes' [Horizontal Pod Autoscaler](http://kubernetes.io/docs/user-guide/horizontal-pod-autoscaling/).
 
