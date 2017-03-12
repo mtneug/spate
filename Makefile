@@ -21,7 +21,7 @@ PKG_INTEGRATION=${PKG}/integration
 PKGS=$(shell go list ./... | grep -v /vendor/)
 
 GO_LDFLAGS=-ldflags " \
-	-s \
+	-s -w \
 	-X '$(PKG)/version.gitCommit=$(GIT_COMMIT)' \
 	-X '$(PKG)/version.gitTreeState=$(GIT_TREE_STATE)' \
 	-X '$(PKG)/version.buildDate=$(BUILD_DATE)'"
@@ -47,11 +47,15 @@ GOMETALINTER_COMMON_ARGS=\
 	--line-length=120
 
 all: lint build test integration
-ci: lint-full build coverage coverage-integration
+ci: lint-full build-static coverage coverage-integration
 
 build:
 	@echo "🌊  $@"
 	@go build $(GO_BUILD_ARGS) -o bin/spate $(PKG)
+
+build-static:
+	@echo "🌊  $@"
+	@CGO_ENABLED=0 go build $(GO_BUILD_ARGS) -a -tags netgo -installsuffix netgo -o bin/spate $(PKG)
 
 install:
 	@echo "🌊  $@"
@@ -133,4 +137,4 @@ ci-docker-image-release:
 	@cd ../spate-docker && git push -f
 	@cd ../spate-docker && git push -f --tags
 
-.PHONY: all ci build install clean lint lint-full test integration coverage coverage-integration ci-docker-image-release
+.PHONY: all ci build build-static install clean lint lint-full test integration coverage coverage-integration ci-docker-image-release
