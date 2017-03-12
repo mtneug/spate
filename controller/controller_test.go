@@ -44,10 +44,12 @@ func TestController(t *testing.T) {
 	sep := &testutils.MockStartStopper{}
 	sep.On("Start", ctx).Return(nil).Once()
 	sep.On("Stop", ctx).Return(nil).Once()
+	sep.On("Err", ctx).Return(nil).Once()
 
 	el := &testutils.MockStartStopper{}
 	el.On("Start", ctx).Return(nil).Once()
 	el.On("Stop", ctx).Return(nil).Once()
+	el.On("Err", ctx).Return(nil).Once()
 
 	ctrl := New(time.Second)
 	ctrl.serviceEventPublisher = sep
