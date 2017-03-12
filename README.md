@@ -6,11 +6,11 @@
 [![Docker Image Version](https://images.microbadger.com/badges/version/mtneug/spate.svg)](https://hub.docker.com/r/mtneug/spate/)
 [![Docker Image Layers](https://images.microbadger.com/badges/image/mtneug/spate.svg)](https://microbadger.com/images/mtneug/spate)
 
-> **spate** `/speɪt/`\
+> **spate** `/speɪt/`<br>
 > noun
 >
 > 1.  freshet, flood
-> 2.  a) a large number or amount\
+> 2.  a) a large number or amount<br>
 >     b) a sudden or strong outburst rush
 >
 > — Merriam-Webster's Learner's Dictionary
