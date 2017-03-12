@@ -3,6 +3,8 @@
 [![GoDoc](https://godoc.org/github.com/mtneug/spate?status.png)](https://godoc.org/github.com/mtneug/spate)
 [![Build Status](https://travis-ci.org/mtneug/spate.svg?branch=master)](https://travis-ci.org/mtneug/spate)
 [![codecov](https://codecov.io/gh/mtneug/spate/branch/master/graph/badge.svg)](https://codecov.io/gh/mtneug/spate)
+[![Docker Image Version](https://images.microbadger.com/badges/version/mtneug/spate.svg)](https://hub.docker.com/r/mtneug/spate/)
+[![Docker Image Layers](https://images.microbadger.com/badges/image/mtneug/spate.svg)](https://microbadger.com/images/mtneug/spate)
 
 > **spate** `/speɪt/`\
 > noun
