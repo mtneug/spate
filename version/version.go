@@ -24,8 +24,8 @@ import (
 
 var (
 	major        = "0"
-	minor        = "0"
-	patch        = "1"
+	minor        = "1"
+	patch        = "0"
 	gitCommit    string // set by Makefile
 	gitTreeState string // set by Makefile
 	buildDate    string // set by Makefile
