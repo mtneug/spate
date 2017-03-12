@@ -37,4 +37,4 @@ script:
   - make ci
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash) -t 0d961a2a-785f-4e37-9877-bb0b627cda2e
+  - bash <(curl -s https://codecov.io/bash)

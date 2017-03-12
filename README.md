@@ -1,15 +1,15 @@
 # :ocean: `spate`
 
 [![GoDoc](https://godoc.org/github.com/mtneug/spate?status.png)](https://godoc.org/github.com/mtneug/spate)
-[![Build Status](https://travis-ci.com/mtneug/spate.svg?token=GBfvMyahwz6qx8tjv3VG&branch=master)](https://travis-ci.com/mtneug/spate)
-[![codecov](https://codecov.io/gh/mtneug/spate/branch/master/graph/badge.svg?token=Q2XAmf6OfS)](https://codecov.io/gh/mtneug/spate)
+[![Build Status](https://travis-ci.org/mtneug/spate.svg?branch=master)](https://travis-ci.org/mtneug/spate)
+[![codecov](https://codecov.io/gh/mtneug/spate/branch/master/graph/badge.svg)](https://codecov.io/gh/mtneug/spate)
 
-> **spate** `/speɪt/`  
+> **spate** `/speɪt/`\
 > noun
 >
-> 1. freshet, flood
-> 2. a) a large number or amount  
->    b) a sudden or strong outburst rush
+> 1.  freshet, flood
+> 2.  a) a large number or amount\
+>     b) a sudden or strong outburst rush
 >
 > — Merriam-Webster's Learner's Dictionary
 
