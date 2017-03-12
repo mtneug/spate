@@ -39,11 +39,26 @@ script:
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 
+before_deploy:
+  - git config --global user.name "Release bot"
+  - git config --global user.email "Release bot"
+
+  - openssl aes-256-cbc -K $encrypted_f0dfd6c7bdac_key -iv $encrypted_f0dfd6c7bdac_iv -in .travis/id_rsa.enc -out ~/.ssh/id_rsa -d
+  - chmod 600 ~/.ssh/id_rsa
+  - eval $(ssh-agent)
+  - ssh-add ~/.ssh/id_rsa
+
 deploy:
   - provider: releases
     api_key:
       secure: m451khvRxesQPRUEf3v/5l3WBiGRBFo1VRVXi4hVPuvjI8n3/A8biS5nQx9Z6Zj1u7eu+tFb5vTnXdJWgMxQe2hl40CHn1xxE2ErQQFMaL0QnWpeXi/yWnWeqOTTb2xVabM4y1hjzbW15dzesZrE//4xQkBv2khg9UFrnvnG7Caiz/S8PQuFsf9UOL5dLYm0uFSVbB/LcMcXUioL6GkhgpYN/jLfQfVyve1iN7Ho6QK6wQ+jHt28bPMnkCo4qObwZ1C6PL9bKmE+OCjxQYFfjTCifXXAxgpvYTvzadEYaDzRpBwuhVUnMbNLvn81Qi0fvCgX7d03LwJhrFEcbJaeJfJWwIE6RpL8Q1nZgaKYDneMrxpm3Fx9jmlJFObMNmo2dBxFoFf8OL8GUDIsnkdOPlsN+RGmigS7n3FdGt6USIJHH73hfinv73bJREgF3nEhY+JRSfwiu8A6hCdaPuFr5BoEZAbKsk9+ylc4kMcTnyCv3amT7lzqbzv56vh08MWaO52ei44yPGXiX4DY3hEUP6xUrwPgFSNrjSN+b6mlZUmaNCd5UK9pAnAvrWTiM0+Stshgy52LRDNSZnTTXRKn+8dme9ix9ighXRbsX2mPBTYwj7FEnHLfQkbUATxcAZM2ngpqHHhuY/NfImHbPTrJCW9tJ5HHEKZfP0yaFAd89/0=
     file: bin/spate
+    on:
+      repo: mtneug/spate
+      tags: true
+      go: 1.8
+  - provider: script
+    script: make ci-docker-image-release
     on:
       repo: mtneug/spate
       tags: true
