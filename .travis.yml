@@ -50,6 +50,7 @@ before_deploy:
 
 deploy:
   - provider: releases
+    skip_cleanup: true
     api_key:
       secure: m451khvRxesQPRUEf3v/5l3WBiGRBFo1VRVXi4hVPuvjI8n3/A8biS5nQx9Z6Zj1u7eu+tFb5vTnXdJWgMxQe2hl40CHn1xxE2ErQQFMaL0QnWpeXi/yWnWeqOTTb2xVabM4y1hjzbW15dzesZrE//4xQkBv2khg9UFrnvnG7Caiz/S8PQuFsf9UOL5dLYm0uFSVbB/LcMcXUioL6GkhgpYN/jLfQfVyve1iN7Ho6QK6wQ+jHt28bPMnkCo4qObwZ1C6PL9bKmE+OCjxQYFfjTCifXXAxgpvYTvzadEYaDzRpBwuhVUnMbNLvn81Qi0fvCgX7d03LwJhrFEcbJaeJfJWwIE6RpL8Q1nZgaKYDneMrxpm3Fx9jmlJFObMNmo2dBxFoFf8OL8GUDIsnkdOPlsN+RGmigS7n3FdGt6USIJHH73hfinv73bJREgF3nEhY+JRSfwiu8A6hCdaPuFr5BoEZAbKsk9+ylc4kMcTnyCv3amT7lzqbzv56vh08MWaO52ei44yPGXiX4DY3hEUP6xUrwPgFSNrjSN+b6mlZUmaNCd5UK9pAnAvrWTiM0+Stshgy52LRDNSZnTTXRKn+8dme9ix9ighXRbsX2mPBTYwj7FEnHLfQkbUATxcAZM2ngpqHHhuY/NfImHbPTrJCW9tJ5HHEKZfP0yaFAd89/0=
     file: bin/spate
@@ -58,6 +59,7 @@ deploy:
       tags: true
       go: 1.8
   - provider: script
+    skip_cleanup: true
     script: make ci-docker-image-release
     on:
       repo: mtneug/spate
