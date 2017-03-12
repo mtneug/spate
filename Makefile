@@ -134,7 +134,7 @@ ci-docker-image-release:
 	@cd ../spate-docker && git commit -m "Update README.md"
 
 	# Push
-	@cd ../spate-docker && git push -f
 	@cd ../spate-docker && git push -f --tags
+	@cd ../spate-docker && git push -f
 
 .PHONY: all ci build build-static install clean lint lint-full test integration coverage coverage-integration ci-docker-image-release
