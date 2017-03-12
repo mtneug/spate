@@ -357,7 +357,7 @@
 			"importpath": "github.com/mtneug/pkg",
 			"repository": "https://github.com/mtneug/pkg",
 			"vcs": "git",
-			"revision": "358503e7219db3bd60b922bb6f70e9fe4b64df63",
+			"revision": "b270c2c35fc775243f87c58cf3f6969c5d9369d6",
 			"branch": "master",
 			"notests": true
 		},

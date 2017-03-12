@@ -154,7 +154,7 @@ func (ss *goStartStopper) Stop(ctx context.Context) error {
 	})
 
 	select {
-	case <-ss.doneChan:
+	case <-ss.Done():
 		return nil
 	case <-ctx.Done():
 		return ctx.Err()

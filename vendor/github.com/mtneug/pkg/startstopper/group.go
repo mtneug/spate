@@ -85,19 +85,28 @@ func (g *Group) run(ctx context.Context, stopChan <-chan struct{}) error {
 		return groupErr
 	}
 
-	<-stopChan
+	select {
+	case <-stopChan:
+	case <-ctx.Done():
+	}
 
 	var wg sync.WaitGroup
 	wg.Add(len(g.sss))
 
-	for i, ss := range g.sss {
-		_i := i
-		_ss := ss
+	for _i, _ss := range g.sss {
+		i, ss := _i, _ss
+
 		go func() {
-			groupErr.Errors[_i] = _ss.Stop(ctx)
-			if groupErr.Errors[_i] != nil {
+			err := ss.Stop(ctx)
+
+			if err == nil {
+				err = ss.Err(ctx)
+			}
+			if err != nil {
 				setErrorOccured()
 			}
+			groupErr.Errors[i] = err
+
 			wg.Done()
 		}()
 	}

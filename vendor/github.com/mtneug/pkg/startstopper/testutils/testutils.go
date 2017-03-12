@@ -66,7 +66,10 @@ type MockRunner struct {
 // Run implements interface.
 func (m *MockRunner) Run(ctx context.Context, stopChan <-chan struct{}) error {
 	args := m.Called(ctx)
-	<-stopChan
+	select {
+	case <-stopChan:
+	case <-ctx.Done():
+	}
 	return args.Error(0)
 }
 
