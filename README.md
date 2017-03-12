@@ -21,7 +21,7 @@ Currently `spate` can scale services based on exposed [Prometheus](https://prome
 
 ## Installation
 
-For every release static Linux binaries can be downloaded from [the release page in GitHub](https://github.com/mtneug/spate/releases/latest). But the easiest way to run `spate` is, of course, as a Docker Swarm service:
+For every release static Linux binaries can be downloaded from [the release page in GitHub](https://github.com/mtneug/spate/releases/latest). But the easiest way to run `spate` is, of course, as a Docker Swarm service with the [`mtneug/spate` image](https://hub.docker.com/r/mtneug/spate/):
 
 ```sh
 $ docker service create \
