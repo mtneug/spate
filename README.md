@@ -51,6 +51,8 @@ $ docker service create \
 
 In this example a `my-worker` service is created. Each replica exposes the `jobs_total` Prometheus metric on port 8080, which should count the number of jobs currently processed. It is the aim, that each replica, in average, processes three jobs. A metric is therefore added with the `de.mtneug.spate.metric.load` labels. This way, if too many jobs are in the system, `spate` automatically increase the replica count and vice versa.
 
+`spate` is highly configurable. Have a look at the [documentation](doc/README.md) for a complete list of options.
+
 ## Example
 
 An example application is provided with [spate-demo](https://github.com/mtneug/spate-demo). Consult this repository's README for more information.
