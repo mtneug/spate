@@ -29,7 +29,7 @@ func TestParseObserver(t *testing.T) {
 	testCases := []struct {
 		label    map[string]string
 		err      error
-		observer metric.Observer
+		observer *metric.Observer
 	}{
 
 		{
@@ -43,7 +43,7 @@ func TestParseObserver(t *testing.T) {
 		{
 			label: map[string]string{},
 			err:   nil,
-			observer: metric.Observer{
+			observer: &metric.Observer{
 				Period:            30 * time.Second,
 				AggregationAmount: 5,
 			},
@@ -54,7 +54,7 @@ func TestParseObserver(t *testing.T) {
 				"aggregation.amount": "42",
 			},
 			err: nil,
-			observer: metric.Observer{
+			observer: &metric.Observer{
 				Period:            42 * time.Second,
 				AggregationAmount: 42,
 			},
@@ -66,7 +66,7 @@ func TestParseObserver(t *testing.T) {
 		err := label.ParseObserver(&observer, c.label)
 		require.Equal(t, c.err, err)
 		if c.err == nil {
-			require.Equal(t, c.observer, observer)
+			require.Equal(t, c.observer, &observer)
 		}
 	}
 }

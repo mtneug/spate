@@ -30,7 +30,7 @@ func TestParseAutoscaler(t *testing.T) {
 	testCases := []struct {
 		labels     map[string]string
 		err        error
-		autoscaler autoscaler.Autoscaler
+		autoscaler *autoscaler.Autoscaler
 	}{
 		{
 			labels: map[string]string{"autoscaler.period": "abc"},
@@ -63,7 +63,7 @@ func TestParseAutoscaler(t *testing.T) {
 		{
 			labels: nil,
 			err:    nil,
-			autoscaler: autoscaler.Autoscaler{
+			autoscaler: &autoscaler.Autoscaler{
 				Period:                    30 * time.Second,
 				CooldownServiceScaledUp:   3 * time.Minute,
 				CooldownServiceScaledDown: 5 * time.Minute,
@@ -84,7 +84,7 @@ func TestParseAutoscaler(t *testing.T) {
 				"replica.max":                         "7",
 			},
 			err: nil,
-			autoscaler: autoscaler.Autoscaler{
+			autoscaler: &autoscaler.Autoscaler{
 				Period:                    1 * time.Minute,
 				CooldownServiceScaledUp:   2 * time.Minute,
 				CooldownServiceScaledDown: 3 * time.Minute,
@@ -101,7 +101,7 @@ func TestParseAutoscaler(t *testing.T) {
 		err := label.ParseAutoscaler(&autoscaler, c.labels)
 		require.Equal(t, c.err, err)
 		if c.err == nil {
-			require.Equal(t, c.autoscaler, autoscaler)
+			require.Equal(t, c.autoscaler, &autoscaler)
 		}
 	}
 }
