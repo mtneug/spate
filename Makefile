@@ -113,28 +113,4 @@ coverage-integration:
 	@echo "🌊  $@"
 	@go test -race -coverprofile="../../../${PKG_INTEGRATION}/coverage.txt" -covermode=atomic ${PKG_INTEGRATION}
 
-ci-docker-image-release:
-	@echo "🌊  $@"
-	@git clone --depth 1 git@github.com:mtneug/spate-docker.git ../spate-docker
-
-	@# Commit binary
-	@echo "Commit binary"
-	@cp bin/spate ../spate-docker/spate
-	@../spate-docker/update-image.sh "${TRAVIS_TAG}" "${TRAVIS_COMMIT}"
-
-	@cd ../spate-docker && git add -A
-	@cd ../spate-docker && git commit -m "Release ${TRAVIS_TAG} - ${TRAVIS_COMMIT}"
-	@cd ../spate-docker && git tag -f "${TRAVIS_TAG}"
-
-	@# Update README.md
-	@echo "Update README"
-	@../spate-docker/update-readme.sh
-
-	@cd ../spate-docker && git add README.md
-	@cd ../spate-docker && git commit -m "Update README.md"
-
-	# Push
-	@cd ../spate-docker && git push -f --tags
-	@cd ../spate-docker && git push -f
-
 .PHONY: all ci build build-static install clean lint lint-full test integration coverage coverage-integration ci-docker-image-release
