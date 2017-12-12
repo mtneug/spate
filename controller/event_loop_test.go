@@ -19,7 +19,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/docker/docker/api/types/swarm"
+	"docker.io/go-docker/api/types/swarm"
 	"github.com/mtneug/pkg/startstopper/testutils"
 	"github.com/mtneug/spate/event"
 	"github.com/stretchr/testify/require"

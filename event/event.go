@@ -15,7 +15,7 @@
 package event
 
 import (
-	"github.com/docker/docker/api/types/swarm"
+	"docker.io/go-docker/api/types/swarm"
 	"github.com/mtneug/pkg/ulid"
 )
 

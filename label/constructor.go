@@ -15,7 +15,7 @@
 package label
 
 import (
-	"github.com/docker/docker/api/types/swarm"
+	"docker.io/go-docker/api/types/swarm"
 	"github.com/mtneug/pkg/reducer"
 	"github.com/mtneug/spate/autoscaler"
 	"github.com/mtneug/spate/metric"

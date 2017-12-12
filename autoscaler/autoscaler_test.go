@@ -17,7 +17,7 @@ package autoscaler_test
 import (
 	"testing"
 
-	"github.com/docker/docker/api/types/swarm"
+	"docker.io/go-docker/api/types/swarm"
 	"github.com/mtneug/spate/autoscaler"
 	"github.com/mtneug/spate/metric"
 	"github.com/stretchr/testify/require"

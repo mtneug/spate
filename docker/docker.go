@@ -20,12 +20,12 @@ import (
 	"strconv"
 	"text/template"
 
-	"github.com/docker/docker/client"
+	"docker.io/go-docker"
 )
 
 var (
 	// C is the default Docker client instance.
-	C *client.Client
+	C *docker.Client
 
 	// Err is the error that was returned when creating the Docker client.
 	Err error
@@ -42,7 +42,7 @@ var (
 )
 
 func init() {
-	C, Err = client.NewEnvClient()
+	C, Err = docker.NewEnvClient()
 }
 
 // PrintInfo writes informations about Docker relevant to spate to the given

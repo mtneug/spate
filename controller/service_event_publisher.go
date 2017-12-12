@@ -19,9 +19,9 @@ import (
 	"fmt"
 	"time"
 
+	"docker.io/go-docker/api/types"
+	"docker.io/go-docker/api/types/filters"
 	log "github.com/Sirupsen/logrus"
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/filters"
 	"github.com/mtneug/pkg/startstopper"
 	"github.com/mtneug/spate/autoscaler"
 	"github.com/mtneug/spate/docker"

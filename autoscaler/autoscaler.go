@@ -21,9 +21,9 @@ import (
 	"sync"
 	"time"
 
+	"docker.io/go-docker/api/types"
+	"docker.io/go-docker/api/types/swarm"
 	log "github.com/Sirupsen/logrus"
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/swarm"
 	"github.com/mtneug/pkg/startstopper"
 	"github.com/mtneug/spate/docker"
 	"github.com/mtneug/spate/event"
@@ -149,7 +149,7 @@ func (a *Autoscaler) tick(ctx context.Context, stopChan <-chan struct{}) {
 	unlock := func() { once.Do(func() { a.Unlock() }) }
 	defer unlock()
 
-	srv, _, err = docker.C.ServiceInspectWithRaw(ctx, a.Service.ID)
+	srv, _, err = docker.C.ServiceInspectWithRaw(ctx, a.Service.ID, types.ServiceInspectOptions{})
 	if err != nil {
 		log.WithError(err).Warn("Service inspection failed")
 		return
@@ -201,7 +201,7 @@ func (a *Autoscaler) tick(ctx context.Context, stopChan <-chan struct{}) {
 		return
 	}
 
-	srv, _, err = docker.C.ServiceInspectWithRaw(ctx, a.Service.ID)
+	srv, _, err = docker.C.ServiceInspectWithRaw(ctx, a.Service.ID, types.ServiceInspectOptions{})
 	if err != nil {
 		log.WithError(err).Warn("Service inspection failed")
 	} else {

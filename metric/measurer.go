@@ -23,8 +23,8 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/filters"
+	"docker.io/go-docker/api/types"
+	"docker.io/go-docker/api/types/filters"
 	"github.com/mtneug/pkg/reducer"
 	"github.com/mtneug/spate/docker"
 	"github.com/prometheus/common/expfmt"
