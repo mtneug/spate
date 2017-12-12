@@ -21,6 +21,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/mtneug/pkg/startstopper"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // Server implements a spate API server.
@@ -34,6 +35,7 @@ type Server struct {
 // New creates a new server.
 func New(addr string) *Server {
 	mux := http.NewServeMux()
+	mux.Handle("/metrics", promhttp.Handler())
 
 	loggedMux := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Debugf("%s \"%s %s %s\"", r.RemoteAddr, r.Method, r.URL, r.Proto)
