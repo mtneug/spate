@@ -97,11 +97,11 @@ func TestParseAutoscaler(t *testing.T) {
 	}
 
 	for _, c := range testCases {
-		autoscaler := autoscaler.Autoscaler{}
-		err := label.ParseAutoscaler(&autoscaler, c.labels)
+		a := autoscaler.Autoscaler{}
+		err := label.ParseAutoscaler(&a, c.labels)
 		require.Equal(t, c.err, err)
 		if c.err == nil {
-			require.Equal(t, c.autoscaler, &autoscaler)
+			require.Equal(t, c.autoscaler, &a)
 		}
 	}
 }
