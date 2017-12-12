@@ -17,7 +17,7 @@ dist: trusty
 sudo: required
 
 go:
-  - 1.8
+  - 1.9
   - tip
 
 services:
@@ -58,4 +58,4 @@ deploy:
     on:
       repo: mtneug/spate
       tags: true
-      go: 1.8
+      go: 1.9
