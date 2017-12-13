@@ -57,6 +57,10 @@ build-static:
 	@echo "🌊  $@"
 	@CGO_ENABLED=0 go build $(GO_BUILD_ARGS) -a -tags netgo -installsuffix netgo -o bin/spate $(PKG)
 
+build-image:
+	@echo "🌊  $@"
+	@docker build -t mtneug/spate .
+
 install:
 	@echo "🌊  $@"
 	@go install $(GO_BUILD_ARGS) $(PKG)

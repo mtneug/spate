@@ -1,6 +1,6 @@
 .git
 .gitignore
 .travis.yml
+Dockerfile
 bin
-Makefile
 README.md
