@@ -113,4 +113,4 @@ coverage-integration:
 	@echo "🌊  $@"
 	@go test -race -coverprofile="../../../${PKG_INTEGRATION}/coverage.txt" -covermode=atomic ${PKG_INTEGRATION}
 
-.PHONY: all ci build build-static install clean lint lint-full test integration coverage coverage-integration ci-docker-image-release
+.PHONY: all ci build build-static install clean lint lint-full test integration coverage coverage-integration

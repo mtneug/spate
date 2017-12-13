@@ -39,15 +39,6 @@ script:
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 
-before_deploy:
-  - git config --global user.name "Release bot"
-  - git config --global user.email "Release bot"
-
-  - openssl aes-256-cbc -K $encrypted_f0dfd6c7bdac_key -iv $encrypted_f0dfd6c7bdac_iv -in .travis/id_rsa.enc -out ~/.ssh/id_rsa -d
-  - chmod 600 ~/.ssh/id_rsa
-  - eval $(ssh-agent)
-  - ssh-add ~/.ssh/id_rsa
-
 deploy:
   - provider: releases
     skip_cleanup: true
