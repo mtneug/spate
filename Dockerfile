@@ -30,11 +30,11 @@ LABEL maintainer="Matthias Neugebauer <mtneug@mailbox.org>" \
       org.label-schema.url="https://github.com/mtneug/spate" \
       org.label-schema.vcs-url="https://github.com/mtneug/spate" \
       org.label-schema.docker.debug="docker exec -it $CONTAINER sh" \
-      org.label-schema.docker.cmd="docker service create --network 'example' --constraint 'node.role == manager' --mount 'type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock' --publish 8080:8080 mtneug/spate" \
+      org.label-schema.docker.cmd="docker service create --network 'example' --constraint 'node.role == manager' --mount 'type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock' --publish 8080:8080 mtneug/spate:0.1.0" \
       org.label-schema.docker.cmd.help="docker run --rm mtneug/spate:0.1.0 --help"
 
 COPY --from=build /go/src/github.com/mtneug/spate/bin/spate /
 COPY --from=build /usr/share/ca-certificates/mozilla /etc/ssl/certs/
 
 EXPOSE 8080
-ENTRYPOINT ["spate"]
+ENTRYPOINT ["/spate"]
